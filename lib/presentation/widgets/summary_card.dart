@@ -379,20 +379,27 @@ class SummaryCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 8,
-                          backgroundColor: AppTheme.backgroundColor,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            isOverBudget
-                                ? AppTheme.expenseColor
-                                : isNearBudget
-                                    ? AppTheme.popHighlightColor
-                                    : AppTheme.baseHighlightColor,
-                          ),
-                        ),
+                      TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0.0, end: progress.clamp(0.0, 1.0)),
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, animatedProgress, child) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: LinearProgressIndicator(
+                              value: animatedProgress,
+                              minHeight: 8,
+                              backgroundColor: AppTheme.backgroundColor,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isOverBudget
+                                    ? AppTheme.expenseColor
+                                    : isNearBudget
+                                        ? AppTheme.popHighlightColor
+                                        : AppTheme.baseHighlightColor,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
