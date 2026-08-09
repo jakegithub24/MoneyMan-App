@@ -166,7 +166,7 @@ class DashboardScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const Text(
-                                  '👋',
+                                  '!👋',
                                   style: TextStyle(fontSize: 24),
                                 ),
                               ],

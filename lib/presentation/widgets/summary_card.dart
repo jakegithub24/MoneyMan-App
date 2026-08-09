@@ -89,14 +89,17 @@ class SummaryCard extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  Text(
-                                    '+$symbol${summary.totalIncome.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      color: AppTheme.incomeColor,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6.0),
+                                    child: Text(
+                                      '$symbol${summary.totalIncome.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        color: AppTheme.incomeColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
@@ -152,14 +155,17 @@ class SummaryCard extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  Text(
-                                    '-$symbol${summary.totalExpense.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      color: AppTheme.expenseColor,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6.0),
+                                    child: Text(
+                                      '$symbol${summary.totalExpense.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        color: AppTheme.expenseColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
@@ -214,14 +220,17 @@ class SummaryCard extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              Text(
-                                '${summary.netBalance >= 0 ? '+' : '-'}$symbol${summary.netBalance.abs().toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  color: summary.netBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                              Padding(
+                                padding: const EdgeInsets.only(left: 6.0),
+                                child: Text(
+                                  '${summary.netBalance < 0 ? '-' : ''}$symbol${summary.netBalance.abs().toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: summary.netBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -275,14 +284,17 @@ class SummaryCard extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  Text(
-                                    '${summary.totalCount} records',
-                                    style: const TextStyle(
-                                      color: AppTheme.textColor,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6.0),
+                                    child: Text(
+                                      '${summary.totalCount} records',
+                                      style: const TextStyle(
+                                        color: AppTheme.textColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
