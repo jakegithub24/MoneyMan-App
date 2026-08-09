@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}MoneyMan - Learn &amp; Glossary{% endblock %}
+
+{% set active_page = 'learn' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-stack-lg">
+    <!-- Header Section -->
+    <div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface dark:text-text-main-dark font-bold">
+            Learn Financial Well-being
+        </h1>
+        <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline mt-1">
+            Build habits, master financial vocabulary, and clarify your financial path.
+        </p>
+    </div>
+
+    <!-- Section 1: Ask MoneyMan AI Mock-up -->
+    <section class="bg-gradient-to-tr from-income-green-subtle/60 to-surface-light dark:from-primary/10 dark:to-surface-dark rounded-3xl p-card-padding border border-primary/20 relative overflow-hidden shadow-sm">
+        <div class="absolute -right-8 -top-8 w-28 h-28 bg-primary/5 rounded-full blur-2xl z-0"></div>
+        <div class="relative z-10 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Ask MoneyMan AI</h3>
+                    <p class="text-xs text-on-surface-variant dark:text-outline">Ask simple finance questions in plain language</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <input type="text" placeholder="e.g. What is the difference between simple and compound interest?" 
+                       class="flex-1 h-touch-target-min px-4 rounded-xl border border-outline-variant/30 bg-surface-light dark:bg-background-dark text-on-surface dark:text-text-main-dark focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm shadow-inner"/>
+                <button type="button" onclick="alert('In production, this connects to Gemini Flash!')"
+                        class="h-touch-target-min px-5 bg-primary text-on-primary rounded-xl font-label-lg text-label-lg hover:bg-surface-tint transition-colors flex items-center justify-center shrink-0 shadow-sm active:scale-95 duration-100">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Wisdom Library (Rules & Strategies) -->
+    <section class="space-y-4">
+        <h2 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Financial Wisdom</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            
+            <!-- Card 1 -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-5 border border-outline-variant/20 shadow-sm flex flex-col justify-between interactive-hover cursor-pointer" onclick="toggleWisdom(1)">
+                <div>
+                    <div class="text-secondary w-9 h-9 rounded-full bg-expense-red-subtle dark:bg-secondary/20 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-sm font-bold">pie_chart</span>
+                    </div>
+                    <h3 class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-bold">The 50/30/20 Rule</h3>
+                    <p class="text-xs text-on-surface-variant dark:text-outline mt-2 line-clamp-3" id="wisdom-desc-1">
+                        A simple budgeting guideline: Allocate 50% of monthly income to Needs (bills, food), 30% to Wants (entertainment), and 20% to Savings or paying off debt.
+                    </p>
+                </div>
+                <span class="text-primary dark:text-primary-fixed text-xs font-semibold hover:underline mt-4 block self-start">Read details</span>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-5 border border-outline-variant/20 shadow-sm flex flex-col justify-between interactive-hover cursor-pointer" onclick="toggleWisdom(2)">
+                <div>
+                    <div class="text-primary dark:text-primary-fixed w-9 h-9 rounded-full bg-income-green-subtle dark:bg-primary/20 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-sm font-bold">health_and_safety</span>
+                    </div>
+                    <h3 class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-bold">Emergency Funds</h3>
+                    <p class="text-xs text-on-surface-variant dark:text-outline mt-2 line-clamp-3" id="wisdom-desc-2">
+                        Set aside 3 to 6 months of living expenses into an easily accessible safety-net fund. This protects you from having to borrow high-interest loans in case of emergencies.
+                    </p>
+                </div>
+                <span class="text-primary dark:text-primary-fixed text-xs font-semibold hover:underline mt-4 block self-start">Read details</span>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-5 border border-outline-variant/20 shadow-sm flex flex-col justify-between interactive-hover cursor-pointer" onclick="toggleWisdom(3)">
+                <div>
+                    <div class="text-tertiary w-9 h-9 rounded-full bg-tertiary-fixed dark:bg-tertiary/20 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-sm font-bold">trending_up</span>
+                    </div>
+                    <h3 class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-bold">Debt Snowball</h3>
+                    <p class="text-xs text-on-surface-variant dark:text-outline mt-2 line-clamp-3" id="wisdom-desc-3">
+                        A debt reduction strategy where you pay off your debts in order of smallest to largest balance. This builds positive behavioral momentum with early, quick victories!
+                    </p>
+                </div>
+                <span class="text-primary dark:text-primary-fixed text-xs font-semibold hover:underline mt-4 block self-start">Read details</span>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Section 3: Interactive Glossary -->
+    <section class="space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Glossary of Terms</h2>
+            
+            <!-- Search bar -->
+            <div class="relative w-full sm:w-64">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline material-symbols-outlined text-[20px]">search</span>
+                <input type="text" id="glossarySearch" placeholder="Search terms..." 
+                       class="w-full h-9 pl-9 pr-4 rounded-full border border-outline-variant/30 bg-surface-light dark:bg-surface-dark text-on-surface dark:text-text-main-dark focus:border-primary focus:ring-1 focus:ring-primary outline-none text-xs transition-colors"/>
+            </div>
+        </div>
+
+        <div class="space-y-3" id="glossaryList">
+            {% set glossary = glossary_items | default([
+                {
+                    'term': 'EMI (Equated Monthly Installment)',
+                    'def': 'A fixed payment amount made by a borrower to a lender at a specified date each calendar month. Equated monthly installments are used to pay off both interest and principal each month.'
+                },
+                {
+                    'term': 'Inflation',
+                    'def': 'The general increase in prices and fall in the purchasing value of money over time. When inflation happens, ₹100 buys fewer goods than it did in the past.'
+                },
+                {
+                    'term': 'Compound Interest',
+                    'def': 'Interest calculated on the initial principal and also on the accumulated interest of previous periods. Essentially, it is "interest on interest", which causes savings to grow faster.'
+                },
+                {
+                    'term': 'Amortization',
+                    'def': 'The action or process of gradually paying off a debt with a fixed repayment schedule over a period of time, dividing the payments into principal repayment and interest charges.'
+                },
+                {
+                    'term': 'Prepayment',
+                    'def': 'The settlement of a debt or installment payment before its official due date. Prepayments reduce the outstanding principal balance, thereby saving interest expenses and reducing remaining tenure.'
+                },
+                {
+                    'term': 'Credit Score',
+                    'def': 'A numerical expression based on a level analysis of a person\'s credit files, representing the creditworthiness of an individual. A higher score increases likelihood of getting cheap loans.'
+                }
+            ]) %}
+
+            {% for item in glossary %}
+            <details class="glossary-item bg-surface-light dark:bg-surface-dark rounded-xl border border-outline-variant/20 shadow-[0px_4px_12px_rgba(0,0,0,0.01)] group overflow-hidden transition-all duration-200" data-term="{{ item.term | lower }}">
+                <summary class="flex justify-between items-center p-4 font-label-lg text-label-lg font-bold text-on-surface dark:text-text-main-dark cursor-pointer list-none select-none hover:bg-surface-container-low dark:hover:bg-surface-container/20">
+                    <span>{{ item.term }}</span>
+                    <span class="material-symbols-outlined text-on-surface-variant dark:text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                </summary>
+                <div class="px-4 pb-4 pt-2 border-t border-outline-variant/10 text-sm text-on-surface-variant dark:text-outline bg-surface-container-lowest/50 dark:bg-surface-dark/40">
+                    <p>{{ item.def }}</p>
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Glossary Live Search Filter
+    const searchInput = document.getElementById('glossarySearch');
+    const items = document.querySelectorAll('.glossary-item');
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        items.forEach(item => {
+            const term = item.dataset.term;
+            if (term.includes(query)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+
+    // Wisdom toggle line-clamp detail simulation
+    const detailTexts = {
+        1: "A simple budgeting guideline: Allocate 50% of monthly income to Needs (bills, food), 30% to Wants (entertainment), and 20% to Savings or paying off debt. This helps prioritize payments while leaving room for fun and financial goals.",
+        2: "Set aside 3 to 6 months of living expenses into an easily accessible safety-net fund. This protects you from having to borrow high-interest loans in case of emergencies, job loss, or medical crises, providing invaluable peace of mind.",
+        3: "A debt reduction strategy where you pay off your debts in order of smallest to largest balance. By wiping out small balances quickly, you build positive behavioral momentum, keeping you motivated to attack larger debts."
+    };
+
+    function toggleWisdom(cardId) {
+        const descEl = document.getElementById(`wisdom-desc-${cardId}`);
+        if (descEl.classList.contains('line-clamp-3')) {
+            descEl.classList.remove('line-clamp-3');
+            descEl.textContent = detailTexts[cardId];
+        } else {
+            descEl.classList.add('line-clamp-3');
+            // slice to original length or keep standard short description
+            if (cardId === 1) descEl.textContent = "A simple budgeting guideline: Allocate 50% of monthly income to Needs (bills, food), 30% to Wants (entertainment), and 20% to Savings or paying off debt.";
+            if (cardId === 2) descEl.textContent = "Set aside 3 to 6 months of living expenses into an easily accessible safety-net fund. This protects you from having to borrow high-interest loans in case of emergencies.";
+            if (cardId === 3) descEl.textContent = "A debt reduction strategy where you pay off your debts in order of smallest to largest balance. This builds positive behavioral momentum with early, quick victories!";
+        }
+    }
+</script>
+{% endblock %}

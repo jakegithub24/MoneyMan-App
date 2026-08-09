@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-stack-lg animate-fade-in-up">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <a href="{{ url_for('dashboard') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container dark:bg-surface-container-high hover:bg-surface-container-high dark:hover:bg-outline-variant/20 transition-colors text-on-surface dark:text-text-main-dark shrink-0">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface dark:text-text-main-dark font-bold">
+                Edit Profile
+            </h1>
+            <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline mt-1">
+                Update your name and profile picture. Your username remains persistent.
+            </p>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if success %}
+    <div class="p-4 rounded-2xl bg-income-green-subtle dark:bg-primary/20 border border-primary text-primary dark:text-primary-fixed font-label-lg text-label-lg flex items-center gap-3">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span>{{ success }}</span>
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="p-4 rounded-2xl bg-expense-red-subtle dark:bg-error/20 border border-error text-error font-label-lg text-label-lg flex items-center gap-3">
+        <span class="material-symbols-outlined">error</span>
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Profile Details Card -->
+    <section class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 border border-outline-variant/20 shadow-sm">
+        <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <!-- Current Avatar Display -->
+            <div class="flex flex-col items-center gap-4 py-4">
+                <div class="w-24 h-24 rounded-full overflow-hidden bg-primary/10 dark:bg-primary/20 border-2 border-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed">
+                    {% if profile_pic %}
+                        <img alt="User profile avatar" class="w-full h-full object-cover" id="avatarPreview" src="{{ profile_pic }}"/>
+                    {% else %}
+                        <span class="material-symbols-outlined text-[48px]" id="avatarPlaceholder">person</span>
+                    {% endif %}
+                </div>
+                <span class="text-xs font-semibold text-on-surface-variant dark:text-outline uppercase tracking-wider">Profile Avatar</span>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Username (Persistent, Read-Only/Disabled) -->
+                <div class="bg-surface-container dark:bg-surface-container-high/20 p-4 rounded-2xl border border-outline-variant/20 flex flex-col gap-1.5 opacity-70">
+                    <label class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                        <span>Username</span>
+                        <span class="material-symbols-outlined text-xs" style="font-size: 14px;">lock</span>
+                    </label>
+                    <input type="text" value="{{ current_username }}" disabled class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark/60 font-body-md text-body-md cursor-not-allowed"/>
+                    <p class="text-[10px] text-on-surface-variant dark:text-outline mt-0.5">Your username is persistent and cannot be changed.</p>
+                </div>
+
+                <!-- Full Name (Editable) -->
+                <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                    <label for="profileName" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Full Name</label>
+                    <input type="text" id="profileName" name="name" value="{{ current_name }}" required placeholder="Your Name" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                </div>
+
+                <!-- Profile Picture (Editable) -->
+                <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                    <label for="profilePicInput" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Change Profile Picture</label>
+                    <input type="file" id="profilePicInput" name="profile_pic" accept="image/*" class="w-full text-on-surface dark:text-text-main-dark font-body-md text-body-md focus:outline-none file:mr-4 file:py-1.5 file:px-3.5 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"/>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full h-12 bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center gap-2 hover:bg-surface-tint transition-all active:scale-95 duration-150 shadow-md">
+                <span class="material-symbols-outlined text-[20px]">save</span>
+                <span>Save Changes</span>
+            </button>
+        </form>
+    </section>
+</div>
+
+<script>
+    // Live preview of uploaded avatar
+    document.getElementById('profilePicInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let img = document.getElementById('avatarPreview');
+                const container = document.querySelector('#avatarPreview') ? document.getElementById('avatarPreview').parentNode : null;
+                
+                if (!img && container) {
+                    const placeholder = document.getElementById('avatarPlaceholder');
+                    if (placeholder) placeholder.remove();
+                    img = document.createElement('img');
+                    img.id = 'avatarPreview';
+                    img.alt = 'User profile avatar';
+                    img.className = 'w-full h-full object-cover';
+                    container.appendChild(img);
+                }
+                if (img) {
+                    img.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

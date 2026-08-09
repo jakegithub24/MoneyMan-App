@@ -1,0 +1,111 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import 'application/use_cases/add_expense_usecase.dart';
+import 'application/use_cases/delete_expense_usecase.dart';
+import 'application/use_cases/get_summary_usecase.dart';
+import 'application/use_cases/list_expenses_usecase.dart';
+import 'application/use_cases/update_expense_usecase.dart';
+import 'data/repositories/category_repository_impl.dart';
+import 'data/repositories/expense_repository_impl.dart';
+import 'domain/repositories/category_repository.dart';
+import 'domain/repositories/expense_repository.dart';
+import 'presentation/screens/main_navigation_screen.dart';
+import 'presentation/state/category/category_cubit.dart';
+import 'presentation/state/currency/currency_cubit.dart';
+import 'presentation/state/dashboard/dashboard_cubit.dart';
+import 'presentation/state/expense_form/expense_form_cubit.dart';
+import 'presentation/state/expense_list/expense_list_cubit.dart';
+import 'presentation/theme/app_theme.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive storage
+  await Hive.initFlutter();
+
+  // Composition Root / Dependency Injection Wiring
+  final expenseRepository = ExpenseRepositoryImpl();
+  final categoryRepository = CategoryRepositoryImpl();
+
+  final addExpenseUseCase = AddExpenseUseCase(expenseRepository);
+  final updateExpenseUseCase = UpdateExpenseUseCase(expenseRepository);
+  final deleteExpenseUseCase = DeleteExpenseUseCase(expenseRepository);
+  final listExpensesUseCase = ListExpensesUseCase(expenseRepository);
+  final getSummaryUseCase = GetSummaryUseCase(expenseRepository);
+
+  runApp(ExpenseTrackerApp(
+    repository: expenseRepository,
+    categoryRepository: categoryRepository,
+    addExpenseUseCase: addExpenseUseCase,
+    updateExpenseUseCase: updateExpenseUseCase,
+    deleteExpenseUseCase: deleteExpenseUseCase,
+    listExpensesUseCase: listExpensesUseCase,
+    getSummaryUseCase: getSummaryUseCase,
+  ));
+}
+
+class ExpenseTrackerApp extends StatelessWidget {
+  final ExpenseRepository repository;
+  final CategoryRepository categoryRepository;
+  final AddExpenseUseCase addExpenseUseCase;
+  final UpdateExpenseUseCase updateExpenseUseCase;
+  final DeleteExpenseUseCase deleteExpenseUseCase;
+  final ListExpensesUseCase listExpensesUseCase;
+  final GetSummaryUseCase getSummaryUseCase;
+
+  const ExpenseTrackerApp({
+    super.key,
+    required this.repository,
+    required this.categoryRepository,
+    required this.addExpenseUseCase,
+    required this.updateExpenseUseCase,
+    required this.deleteExpenseUseCase,
+    required this.listExpensesUseCase,
+    required this.getSummaryUseCase,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CurrencyCubit>(
+          create: (_) => CurrencyCubit(repository)..loadCurrency(),
+        ),
+        BlocProvider<CategoryCubit>(
+          create: (_) => CategoryCubit(
+            categoryRepository: categoryRepository,
+          )..loadCategories(),
+        ),
+        BlocProvider<DashboardCubit>(
+          create: (_) => DashboardCubit(
+            getSummaryUseCase: getSummaryUseCase,
+            listExpensesUseCase: listExpensesUseCase,
+          )..loadDashboard(),
+        ),
+        BlocProvider<ExpenseListCubit>(
+          create: (_) => ExpenseListCubit(
+            listExpensesUseCase: listExpensesUseCase,
+            deleteExpenseUseCase: deleteExpenseUseCase,
+          )..loadExpenses(),
+        ),
+        BlocProvider<ExpenseFormCubit>(
+          create: (_) => ExpenseFormCubit(
+            addExpenseUseCase: addExpenseUseCase,
+            updateExpenseUseCase: updateExpenseUseCase,
+            deleteExpenseUseCase: deleteExpenseUseCase,
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'MoneyMan',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.darkTheme,
+        home: MainNavigationScreen(
+          repository: repository,
+        ),
+      ),
+    );
+  }
+}

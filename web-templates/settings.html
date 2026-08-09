@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-stack-lg">
+    <!-- Header -->
+    <div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface dark:text-text-main-dark font-bold">
+            App Settings
+        </h1>
+        <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline mt-1">
+            Manage your security PIN, data privacy, cloud synchronization, and accessibility preferences.
+        </p>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if success %}
+    <div class="p-4 rounded-2xl bg-income-green-subtle dark:bg-primary/20 border border-primary text-primary dark:text-primary-fixed font-label-lg text-label-lg flex items-center gap-3">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span>{{ success }}</span>
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="p-4 rounded-2xl bg-expense-red-subtle dark:bg-error/20 border border-error text-error font-label-lg text-label-lg flex items-center gap-3">
+        <span class="material-symbols-outlined">error</span>
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- 1. Security & Authentication -->
+    <section class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 border border-outline-variant/20 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 pb-3 border-b border-outline-variant/10">
+            <span class="material-symbols-outlined text-primary text-[28px]">security</span>
+            <h3 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Security PIN</h3>
+        </div>
+
+        <form action="{{ url_for('settings_change_pin') }}" method="POST" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Current PIN -->
+                <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                    <label for="currentPin" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Current PIN</label>
+                    <input type="password" id="currentPin" name="current_pin" maxlength="4" required placeholder="••••" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                </div>
+
+                <!-- New PIN -->
+                <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                    <label for="newPin" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">New PIN</label>
+                    <input type="password" id="newPin" name="new_pin" maxlength="4" required placeholder="••••" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                </div>
+
+                <!-- Confirm New PIN -->
+                <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                    <label for="confirmPin" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Confirm New PIN</label>
+                    <input type="password" id="confirmPin" name="confirm_pin" maxlength="4" required placeholder="••••" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                </div>
+            </div>
+
+            <button type="submit" class="h-12 px-6 bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center gap-2 hover:bg-surface-tint transition-all active:scale-95 duration-150 shadow-md">
+                <span class="material-symbols-outlined text-[20px]">lock_reset</span>
+                <span>Update Security PIN</span>
+            </button>
+        </form>
+    </section>
+
+    <!-- 2. Sync & Privacy -->
+    <section class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 border border-outline-variant/20 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 pb-3 border-b border-outline-variant/10">
+            <span class="material-symbols-outlined text-primary text-[28px]">cloud_sync</span>
+            <h3 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Data Sync & Privacy</h3>
+        </div>
+
+        <form action="{{ url_for('settings_update_sync') }}" method="POST" class="space-y-6">
+            <div class="flex items-start justify-between p-3 rounded-2xl bg-surface-container-low dark:bg-surface-container-high/20 border border-outline-variant/10">
+                <div class="flex gap-3">
+                    <div class="w-10 h-10 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center text-on-surface-variant dark:text-text-main-dark shrink-0">
+                        <span class="material-symbols-outlined">backup</span>
+                    </div>
+                    <div>
+                        <p class="font-body-md text-body-md text-on-surface dark:text-text-main-dark font-semibold">Enable Online Profile Sync</p>
+                        <p class="text-xs text-on-surface-variant dark:text-outline mt-0.5">
+                            Keep your transactions and goals backed up in the cloud. If disabled, all data stays strictly local and encrypted on this device.
+                        </p>
+                    </div>
+                </div>
+                <!-- Custom Switch -->
+                <div class="relative w-12 h-7 bg-outline-variant/40 dark:bg-surface-container-high rounded-full overflow-hidden shadow-inner transition-colors group-hover:bg-outline-variant shrink-0">
+                    <input class="sr-only peer" type="checkbox" name="sync_enabled" id="syncToggle" value="true" {% if sync_enabled %}checked{% endif %}/>
+                    <div class="absolute left-1 top-1 w-5 h-5 bg-surface-light dark:bg-text-main-dark rounded-full shadow-sm transition-transform peer-checked:translate-x-5 peer-checked:bg-primary-container"></div>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-surface-container-lowest dark:bg-background-dark border border-outline-variant/10 flex gap-3 text-xs leading-relaxed text-on-surface-variant dark:text-outline">
+                <span class="material-symbols-outlined text-primary text-[20px] shrink-0">verified_user</span>
+                <div>
+                    <span class="font-bold text-on-surface dark:text-text-main-dark block mb-0.5">Offline Privacy Guarantee</span>
+                    By default, MoneyMan runs completely locally using an offline SQLite database. We do not transmit or scan any transaction records unless sync is explicitly enabled above.
+                </div>
+            </div>
+
+            <button type="submit" class="h-12 px-6 bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center gap-2 hover:bg-surface-tint transition-all active:scale-95 duration-150 shadow-md">
+                <span class="material-symbols-outlined text-[20px]">save</span>
+                <span>Save Privacy Settings</span>
+            </button>
+        </form>
+    </section>
+
+    <!-- 3. Preferences & Theme Toggle -->
+    <section class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 border border-outline-variant/20 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 pb-3 border-b border-outline-variant/10">
+            <span class="material-symbols-outlined text-primary text-[28px]">palette</span>
+            <h3 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Display Preferences</h3>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Theme Toggle Card -->
+            <button onclick="toggleTheme()" class="flex items-center justify-between p-4 rounded-2xl bg-surface-container-low dark:bg-surface-container-high/20 border border-outline-variant/10 text-left hover:bg-surface-container transition-all">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">dark_mode</span>
+                    <div>
+                        <p class="font-body-md text-body-md text-on-surface dark:text-text-main-dark font-semibold">Color Scheme</p>
+                        <p class="text-xs text-on-surface-variant dark:text-outline mt-0.5">Toggle light or dark theme</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+            </button>
+
+            <!-- Accessibility Card -->
+            <button onclick="toggleAccessibility()" class="flex items-center justify-between p-4 rounded-2xl bg-surface-container-low dark:bg-surface-container-high/20 border border-outline-variant/10 text-left hover:bg-surface-container transition-all">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">text_fields</span>
+                    <div>
+                        <p class="font-body-md text-body-md text-on-surface dark:text-text-main-dark font-semibold">Accessible Text</p>
+                        <p class="text-xs text-on-surface-variant dark:text-outline mt-0.5">Scale font size & weights</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 4. Session Action -->
+    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+        <a href="{{ url_for('lock') }}" class="flex-1 h-14 bg-surface-container dark:bg-surface-container-high border border-outline-variant/30 text-on-surface dark:text-text-main-dark rounded-full font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm hover:opacity-90 active:scale-95 duration-150" title="Temporarily lock app screen (requires PIN to unlock)">
+            <span class="material-symbols-outlined">lock</span>
+            <span>Lock Application</span>
+        </a>
+        <a href="{{ url_for('logout') }}" onclick="return confirm('Logging out will completely reset your local profile and delete all transactions from this device. Proceed?')" class="flex-1 h-14 bg-secondary text-on-secondary rounded-full font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-md hover:opacity-90 active:scale-95 duration-150" title="Completely reset app and clear profile data">
+            <span class="material-symbols-outlined">logout</span>
+            <span>Logout & Reset Profile</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

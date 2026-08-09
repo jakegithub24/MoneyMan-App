@@ -1,0 +1,471 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/repositories/expense_repository.dart';
+import '../state/category/category_cubit.dart';
+import '../state/currency/currency_cubit.dart';
+import '../state/currency/currency_state.dart';
+import '../state/dashboard/dashboard_cubit.dart';
+import '../state/expense_list/expense_list_cubit.dart';
+import '../theme/app_theme.dart';
+import '../widgets/currency_selector_dialog.dart';
+import '../widgets/export_data_dialog.dart';
+import '../widgets/import_data_dialog.dart';
+import 'categories_screen.dart';
+import 'security_pin_screen.dart';
+
+class SettingsScreen extends StatefulWidget {
+  final ExpenseRepository repository;
+  final VoidCallback onSettingsUpdated;
+
+  const SettingsScreen({
+    super.key,
+    required this.repository,
+    required this.onSettingsUpdated,
+  });
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  double _currentBudget = 0.0;
+  bool _isLockEnabled = false;
+  String? _savedPin;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final budget = await widget.repository.getMonthlyBudget();
+    final lockEnabled = await widget.repository.isSecurityLockEnabled();
+    final pin = await widget.repository.getSecurityPin();
+    setState(() {
+      _currentBudget = budget;
+      _isLockEnabled = lockEnabled;
+      _savedPin = pin;
+    });
+  }
+
+  Future<void> _setBudgetDialog() async {
+    final currencySymbol = context.read<CurrencyCubit>().state.currency.symbol;
+    final controller = TextEditingController(text: _currentBudget.toStringAsFixed(0));
+    final result = await showDialog<double>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardBackgroundColor,
+        title: const Text('Set Monthly Budget', style: TextStyle(color: AppTheme.textColor)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter your target monthly spending limit:',
+              style: TextStyle(color: AppTheme.textColor, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    currencySymbol,
+                    style: const TextStyle(
+                      color: AppTheme.baseHighlightColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                hintText: 'e.g. 1500',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.baseHighlightColor,
+              foregroundColor: AppTheme.backgroundColor,
+            ),
+            onPressed: () {
+              final val = double.tryParse(controller.text.trim());
+              if (val != null && val >= 0) {
+                Navigator.pop(ctx, val);
+              }
+            },
+            child: const Text('Save Budget'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      await widget.repository.setMonthlyBudget(result);
+      await _loadSettings();
+      widget.onSettingsUpdated();
+    }
+  }
+
+  Future<void> _toggleSecurityLock(bool enabled) async {
+    if (enabled) {
+      final pin = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const SecurityPinScreen(mode: PinMode.setup),
+        ),
+      );
+      if (pin != null && pin.isNotEmpty) {
+        await widget.repository.setSecurityPin(pin);
+        await widget.repository.setSecurityLockEnabled(true);
+        await _loadSettings();
+        widget.onSettingsUpdated();
+      }
+    } else {
+      await widget.repository.setSecurityLockEnabled(false);
+      await _loadSettings();
+      widget.onSettingsUpdated();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: AppTheme.backgroundColor,
+        title: const Text(
+          'Settings & Tools',
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Preferences Section
+          _buildSectionHeader('PREFERENCES'),
+          BlocBuilder<CurrencyCubit, CurrencyState>(
+            builder: (context, state) {
+              final currency = state.currency;
+              return Card(
+                color: AppTheme.cardBackgroundColor,
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.popHighlightColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.currency_exchange_rounded, color: AppTheme.popHighlightColor),
+                  ),
+                  title: const Text(
+                    'Currency',
+                    style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    '${currency.flag} ${currency.name} (${currency.symbol} - ${currency.code})',
+                    style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => const CurrencySelectorDialog(),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+
+          // Categories Management Section
+          _buildSectionHeader('CATEGORIES'),
+          Card(
+            color: AppTheme.cardBackgroundColor,
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.category_rounded, color: AppTheme.baseHighlightColor),
+              ),
+              title: const Text(
+                'Manage Categories',
+                style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              ),
+              subtitle: const Text(
+                'Create or delete income and expense categories',
+                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Budget Section
+          _buildSectionHeader('FINANCIAL GOALS'),
+          BlocBuilder<CurrencyCubit, CurrencyState>(
+            builder: (context, currState) {
+              final symbol = currState.currency.symbol;
+              return Card(
+                color: AppTheme.cardBackgroundColor,
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.incomeColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.account_balance_wallet_rounded,
+                        color: AppTheme.incomeColor),
+                  ),
+                  title: const Text(
+                    'Monthly Target Budget',
+                    style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    'Current: $symbol${_currentBudget.toStringAsFixed(2)}',
+                    style: const TextStyle(color: AppTheme.textColor),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                  onTap: _setBudgetDialog,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+
+          // Security Section
+          _buildSectionHeader('SECURITY & PRIVACY'),
+          Card(
+            color: AppTheme.cardBackgroundColor,
+            child: Column(
+              children: [
+                SwitchListTile(
+                  secondary: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.incomeColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.lock_outline_rounded,
+                        color: AppTheme.incomeColor),
+                  ),
+                  title: const Text(
+                    'App Security PIN Lock',
+                    style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: const Text(
+                    'Require 4-digit PIN to access app',
+                    style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+                  ),
+                  value: _isLockEnabled,
+                  activeThumbColor: AppTheme.baseHighlightColor,
+                  onChanged: _toggleSecurityLock,
+                ),
+                if (_isLockEnabled && _savedPin != null) ...[
+                  const Divider(color: AppTheme.backgroundColor, height: 1),
+                  ListTile(
+                    leading: const SizedBox(width: 40),
+                    title: const Text(
+                      'Change Security PIN',
+                      style: TextStyle(color: AppTheme.baseHighlightColor, fontSize: 14),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final newPin = await Navigator.push<String>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SecurityPinScreen(mode: PinMode.setup),
+                        ),
+                      );
+                      if (newPin != null && newPin.isNotEmpty) {
+                        await widget.repository.setSecurityPin(newPin);
+                        await _loadSettings();
+                        if (mounted) {
+                          messenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('PIN updated successfully', style: TextStyle(color: AppTheme.textColor)),
+                              backgroundColor: AppTheme.cardBackgroundColor,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Export & Import Section
+          _buildSectionHeader('DATA MANAGEMENT'),
+          Card(
+            color: AppTheme.cardBackgroundColor,
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.popHighlightColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.file_download_rounded, color: AppTheme.popHighlightColor),
+              ),
+              title: const Text(
+                'Export CSV Data',
+                style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              ),
+              subtitle: const Text(
+                'Export Income, Expenses, or Both for Day, Week, Year',
+                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => ExportDataDialog(repository: widget.repository),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            color: AppTheme.cardBackgroundColor,
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.file_upload_rounded, color: AppTheme.baseHighlightColor),
+              ),
+              title: const Text(
+                'Import CSV Data',
+                style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              ),
+              subtitle: const Text(
+                'Import MoneyMan generated .csv file to restore transactions',
+                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => ImportDataDialog(repository: widget.repository),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('RESET APP DATA'),
+          Card(
+            color: AppTheme.cardBackgroundColor,
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.expenseColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.restart_alt_rounded, color: AppTheme.expenseColor),
+              ),
+              title: const Text(
+                'Reset Database & Start Fresh',
+                style: TextStyle(color: AppTheme.expenseColor, fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text(
+                'Wipe all app data, custom categories, and start from scratch',
+                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+              ),
+              onTap: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: AppTheme.cardBackgroundColor,
+                    title: const Text(
+                      'Reset Database?',
+                      style: TextStyle(color: AppTheme.expenseColor, fontWeight: FontWeight.bold),
+                    ),
+                    content: const Text(
+                      'Are you sure you want to reset all app database and start from scratch? All transaction history and settings will be wiped.',
+                      style: TextStyle(color: AppTheme.textColor, fontSize: 14),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.expenseColor,
+                          foregroundColor: AppTheme.textColor,
+                        ),
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Reset All'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true && context.mounted) {
+                  await widget.repository.resetDatabase();
+                  if (context.mounted) {
+                    await context.read<CategoryCubit>().resetCategories();
+                    if (context.mounted) {
+                      context.read<DashboardCubit>().loadDashboard();
+                      context.read<ExpenseListCubit>().loadExpenses();
+                      context.read<CurrencyCubit>().loadCurrency();
+                      widget.onSettingsUpdated();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Database reset successfully. App started from scratch.', style: TextStyle(color: AppTheme.textColor)),
+                          backgroundColor: AppTheme.cardBackgroundColor,
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: AppTheme.baseHighlightColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+}

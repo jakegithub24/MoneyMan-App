@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>MoneyMan - Onboarding</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind Custom Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "income-green-subtle": "#E8F5E9",
+                        "expense-red-subtle": "#FBE9E7",
+                        "inverse-surface": "#2f3131",
+                        "on-secondary-fixed-variant": "#872100",
+                        "inverse-on-surface": "#f0f1f1",
+                        "surface-light": "#FFFFFF",
+                        "on-primary-fixed": "#002204",
+                        "on-tertiary-fixed-variant": "#643f00",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-lowest": "#ffffff",
+                        "text-main-dark": "#F0F0F0",
+                        "secondary-fixed-dim": "#ffb5a0",
+                        "on-primary-container": "#cbffc2",
+                        "primary": "#0d631b",
+                        "surface-tint": "#1b6d24",
+                        "on-tertiary-container": "#ffeede",
+                        "surface-container-highest": "#e2e2e2",
+                        "text-main-light": "#1A1C1A",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "secondary-container": "#fc5929",
+                        "on-surface-variant": "#40493d",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary-container": "#541100",
+                        "on-tertiary-fixed": "#2a1800",
+                        "tertiary-container": "#986200",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#2e7d32",
+                        "outline-variant": "#bfcaba",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dadada",
+                        "background": "#f9f9f9",
+                        "surface-dark": "#1E1E1E",
+                        "inverse-primary": "#88d982",
+                        "surface-variant": "#e2e2e2",
+                        "background-dark": "#121212",
+                        "on-secondary-fixed": "#3b0900",
+                        "on-primary-fixed-variant": "#005312",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a3f69c",
+                        "surface-bright": "#f9f9f9",
+                        "surface": "#f9f9f9",
+                        "tertiary": "#774c00",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#b02e00",
+                        "outline": "#707a6c",
+                        "secondary-fixed": "#ffdbd1",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "primary-fixed-dim": "#88d982",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1a1c1c",
+                        "tertiary-fixed": "#ffddb5",
+                        "surface-container-low": "#f3f3f3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "container-margin": "20px",
+                        "gutter": "16px",
+                        "card-padding": "24px",
+                        "stack-md": "24px",
+                        "stack-lg": "40px",
+                        "touch-target-min": "48px",
+                        "stack-sm": "12px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .dark body {
+            background-color: #121212;
+            color: #f0f1f1;
+        }
+        .onboarding-screen {
+            display: none;
+            opacity: 0;
+        }
+        .onboarding-screen.active {
+            display: flex;
+            animation: screenEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes screenEnter {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface dark:bg-background-dark text-on-surface dark:text-text-main-dark font-body-md h-screen w-screen flex items-center justify-center m-0 p-0 overflow-hidden select-none">
+    
+    <!-- Mobile-like Frame Simulated for Onboarding -->
+    <main class="w-screen sm:w-full h-full max-w-none sm:max-w-md bg-surface-container-lowest dark:bg-surface-dark mx-auto shadow-xl relative flex flex-col sm:h-[800px] sm:max-h-[95dvh] sm:rounded-[32px] sm:my-auto sm:border sm:border-outline-variant/30 overflow-hidden">
+        
+        <!-- Onboarding Header -->
+        <header class="flex justify-between items-center h-16 px-4 sm:px-container-margin w-full bg-surface-container-lowest dark:bg-surface-dark z-50 shrink-0 border-b border-outline-variant/10">
+            <button aria-label="Go back" class="invisible w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-text-main-dark" id="backBtn">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+            </button>
+            <span class="font-headline-md text-headline-md font-extrabold text-primary dark:text-primary-fixed">MoneyMan</span>
+            <div class="w-12 h-12"></div> <!-- Spacer -->
+        </header>
+        
+        <!-- Forms block to wrap everything so developers can tie it to a POST endpoint -->
+        <form id="onboardingForm" method="POST" action="{{ submit_url | default('/onboarding') }}" enctype="multipart/form-data" class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-container-margin pb-6 sm:pb-stack-lg relative">
+                {% if error or request.args.get('error') %}
+                <div class="p-4 mb-4 rounded-2xl bg-expense-red-subtle dark:bg-error/20 border border-error text-error font-label-lg text-label-lg flex items-center gap-3">
+                    <span class="material-symbols-outlined">error</span>
+                    <span>{{ error or request.args.get('error') }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- Screen 1: Welcome -->
+                <section class="onboarding-screen active flex-col min-h-full justify-between pt-6 sm:pt-stack-lg" id="screen1">
+                    <div class="flex flex-col items-center text-center space-y-stack-md">
+                        <!-- Logo Icon -->
+                        <div class="w-28 h-28 rounded-3xl bg-income-green-subtle dark:bg-primary/20 flex items-center justify-center p-4 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.05)]">
+                            <span class="material-symbols-outlined text-[64px] text-primary dark:text-primary-fixed" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+                        </div>
+                        <div class="space-y-stack-sm mt-4">
+                            <h1 class="font-display-lg text-display-lg text-on-surface dark:text-text-main-dark">Your Money,<br/>Your Way.</h1>
+                            <p class="font-body-lg text-body-lg text-on-surface-variant dark:text-outline max-w-[280px] mx-auto">
+                                Track expenses effortlessly and build better habits, one step at a time.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-stack-md mt-auto pb-stack-md pt-8">
+                        <!-- Privacy Consent Toggle -->
+                        <label class="flex items-start space-x-gutter p-4 sm:p-card-padding bg-surface-container-low dark:bg-surface-container-high/40 rounded-xl cursor-pointer">
+                            <div class="flex items-center h-6">
+                                <input class="form-checkbox h-6 w-6 text-primary rounded border-outline-variant dark:border-outline focus:ring-primary focus:ring-opacity-50 transition duration-150 ease-in-out cursor-pointer" id="privacyToggle" required="" type="checkbox"/>
+                            </div>
+                            <div class="flex-1 pl-2">
+                                <p class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark">I agree to the <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-fixed hover:underline font-bold">Terms</a> &amp; <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-primary dark:text-primary-fixed hover:underline font-bold">Privacy Policy</a>.</p>
+                                <p class="font-label-sm text-label-sm text-on-surface-variant dark:text-outline mt-1">We respect your privacy. All financial data is encrypted and saved locally on your device.</p>
+                            </div>
+                        </label>
+                        <!-- Next Action -->
+                        <button type="button" class="w-full h-touch-target-min bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-surface-tint" disabled="" id="btnNext1">
+                            Get Started
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- Screen 2: Already a Cloud User? -->
+                <section class="onboarding-screen flex-col min-h-full pt-4 sm:pt-stack-md" id="screen2">
+                    <div class="space-y-stack-sm mb-4 text-center">
+                        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface dark:text-text-main-dark">Already a cloud user?</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline">Opt in to connect and sync your profile.</p>
+                    </div>
+                    
+                    <div id="screen2Error" class="hidden p-4 mb-4 rounded-2xl bg-expense-red-subtle dark:bg-error/20 border border-error text-error font-label-lg text-label-lg flex items-center gap-3">
+                        <span class="material-symbols-outlined">error</span>
+                        <span id="screen2ErrorText"></span>
+                    </div>
+                    
+                    <div class="flex flex-col space-y-gutter flex-1">
+                        <!-- Hidden fields to hold backend values -->
+                        <input type="hidden" name="sync_enabled" id="syncEnabledInput" value="false">
+                        <input type="hidden" name="name" id="hiddenNameInput" value="Cloud User" disabled>
+                        <input type="hidden" name="persona" id="hiddenPersonaInput" value="student" disabled>
+
+                        <!-- Option 1: Yes -->
+                        <label class="flex items-center p-4 sm:p-card-padding bg-surface dark:bg-surface-container-high/20 rounded-2xl border border-outline-variant/40 dark:border-outline/20 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.02)] cursor-pointer transition-all duration-200 hover:bg-surface-container dark:hover:bg-surface-container-high/40 has-[:checked]:bg-income-green-subtle dark:has-[:checked]:bg-primary/20 has-[:checked]:border-primary has-[:checked]:shadow-[0px_4px_20px_0px_rgba(0,0,0,0.05)]">
+                            <input class="sr-only" name="already_cloud" type="radio" value="yes" required/>
+                            <div class="w-12 h-12 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center mr-gutter shrink-0 text-primary dark:text-primary-fixed">
+                                <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">cloud_sync</span>
+                            </div>
+                            <div class="flex-1 pl-2">
+                                <span class="block font-headline-md text-headline-md text-on-surface dark:text-text-main-dark">Yes, cloud sync user</span>
+                                <span class="block font-label-sm text-label-sm text-on-surface-variant dark:text-outline mt-1">Connect your existing cloud profile</span>
+                            </div>
+                            <div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center shrink-0 check-indicator transition-all">
+                                <span class="material-symbols-outlined text-[16px] text-white opacity-0 transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+                            </div>
+                        </label>
+                        
+                        <!-- Option 2: No -->
+                        <label class="flex items-center p-4 sm:p-card-padding bg-surface dark:bg-surface-container-high/20 rounded-2xl border border-outline-variant/40 dark:border-outline/20 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.02)] cursor-pointer transition-all duration-200 hover:bg-surface-container dark:hover:bg-surface-container-high/40 has-[:checked]:bg-income-green-subtle dark:has-[:checked]:bg-primary/20 has-[:checked]:border-primary has-[:checked]:shadow-[0px_4px_20px_0px_rgba(0,0,0,0.05)]">
+                            <input class="sr-only" name="already_cloud" type="radio" value="no"/>
+                            <div class="w-12 h-12 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center mr-gutter shrink-0 text-primary dark:text-primary-fixed">
+                                <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">person_add</span>
+                            </div>
+                            <div class="flex-1 pl-2">
+                                <span class="block font-headline-md text-headline-md text-on-surface dark:text-text-main-dark">No, new profile</span>
+                                <span class="block font-label-sm text-label-sm text-on-surface-variant dark:text-outline mt-1">Set up a fresh profile and budget</span>
+                            </div>
+                            <div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center shrink-0 check-indicator transition-all">
+                                <span class="material-symbols-outlined text-[16px] text-white opacity-0 transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+                            </div>
+                        </label>
+
+                        <!-- Cloud Credentials Section (shown dynamically) -->
+                        <div id="cloudCredentialsSection" class="hidden space-y-4 mt-4 transition-all duration-300">
+                            <!-- Cloud Username -->
+                            <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                                <label for="cloudUsername" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Cloud Username</label>
+                                <input type="text" id="cloudUsername" name="username" placeholder="e.g., johndoe" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                            </div>
+
+                            <!-- Cloud Password -->
+                            <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                                <label for="cloudPassword" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Cloud Password</label>
+                                <input type="password" id="cloudPassword" name="password" placeholder="••••••••" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-auto pb-stack-md pt-4 bg-surface-container-lowest dark:bg-surface-dark">
+                        <button type="button" class="w-full h-touch-target-min bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-surface-tint" disabled="" id="btnNext2">
+                            Continue
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- Screen 3: Create Profile -->
+                <section class="onboarding-screen flex-col min-h-full pt-4 sm:pt-stack-md" id="screen3">
+                    <div class="space-y-stack-sm mb-4 text-center">
+                        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface dark:text-text-main-dark">Create Profile</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline">Choose a persona and enter your profile details</p>
+                    </div>
+
+                    <div class="space-y-4 flex-1">
+                        <!-- Profile/Persona Options -->
+                        <div class="space-y-2">
+                            <span class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider block mb-1">Select Persona</span>
+                            <div class="grid grid-cols-3 gap-2">
+                                <!-- Student Option -->
+                                <label class="flex flex-col items-center p-3 bg-surface dark:bg-surface-container-high/20 rounded-xl border border-outline-variant/40 dark:border-outline/20 cursor-pointer transition-all duration-200 hover:bg-surface-container dark:hover:bg-surface-container-high/40 has-[:checked]:bg-income-green-subtle dark:has-[:checked]:bg-primary/20 has-[:checked]:border-primary relative">
+                                    <input class="sr-only" name="persona" type="radio" value="student"/>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center mb-1 text-primary dark:text-primary-fixed">
+                                        <span class="material-symbols-outlined text-[18px]">school</span>
+                                    </div>
+                                    <span class="text-[13px] font-bold text-on-surface dark:text-text-main-dark">Student</span>
+                                    <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center persona-check-indicator transition-all">
+                                        <span class="material-symbols-outlined text-[10px] text-white opacity-0 transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+                                    </div>
+                                </label>
+
+                                <!-- Gig Worker Option -->
+                                <label class="flex flex-col items-center p-3 bg-surface dark:bg-surface-container-high/20 rounded-xl border border-outline-variant/40 dark:border-outline/20 cursor-pointer transition-all duration-200 hover:bg-surface-container dark:hover:bg-surface-container-high/40 has-[:checked]:bg-income-green-subtle dark:has-[:checked]:bg-primary/20 has-[:checked]:border-primary relative">
+                                    <input class="sr-only" name="persona" type="radio" value="gig_worker"/>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center mb-1 text-primary dark:text-primary-fixed">
+                                        <span class="material-symbols-outlined text-[18px]">two_wheeler</span>
+                                    </div>
+                                    <span class="text-[13px] font-bold text-on-surface dark:text-text-main-dark text-center">Gig-worker</span>
+                                    <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center persona-check-indicator transition-all">
+                                        <span class="material-symbols-outlined text-[10px] text-white opacity-0 transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+                                    </div>
+                                </label>
+
+                                <!-- Elderly Option -->
+                                <label class="flex flex-col items-center p-3 bg-surface dark:bg-surface-container-high/20 rounded-xl border border-outline-variant/40 dark:border-outline/20 cursor-pointer transition-all duration-200 hover:bg-surface-container dark:hover:bg-surface-container-high/40 has-[:checked]:bg-income-green-subtle dark:has-[:checked]:bg-primary/20 has-[:checked]:border-primary relative">
+                                    <input class="sr-only" name="persona" type="radio" value="retired"/>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center mb-1 text-primary dark:text-primary-fixed">
+                                        <span class="material-symbols-outlined text-[18px]">chair_alt</span>
+                                    </div>
+                                    <span class="text-[13px] font-bold text-on-surface dark:text-text-main-dark text-center">Elderly</span>
+                                    <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center persona-check-indicator transition-all">
+                                        <span class="material-symbols-outlined text-[10px] text-white opacity-0 transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                            <label for="fullName" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Full Name</label>
+                            <input type="text" id="fullName" name="name" placeholder="John Doe" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                            <label for="usernameInput" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Username</label>
+                            <input type="text" id="usernameInput" name="username" placeholder="johndoe12" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                        </div>
+
+                        <!-- Profile Picture Upload -->
+                        <div class="bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                            <label for="profilePic" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Profile Picture</label>
+                            <input type="file" id="profilePic" name="profile_pic" accept="image/*" class="w-full text-on-surface dark:text-text-main-dark font-body-md text-body-md focus:outline-none file:mr-4 file:py-1.5 file:px-3.5 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"/>
+                        </div>
+
+                        <!-- Account Storage Type: Local vs Cloud -->
+                        <div class="space-y-2">
+                            <span class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider block mb-1">Account Storage Mode</span>
+                            <div class="grid grid-cols-2 gap-3">
+                                <!-- Local Only -->
+                                <label class="flex items-center p-3 bg-surface dark:bg-surface-container-high/20 rounded-xl border border-outline-variant/40 dark:border-outline/20 cursor-pointer transition-all duration-200 hover:bg-surface-container dark:hover:bg-surface-container-high/40 has-[:checked]:bg-income-green-subtle dark:has-[:checked]:bg-primary/20 has-[:checked]:border-primary relative">
+                                    <input class="sr-only" name="account_type" type="radio" value="local" checked/>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center mr-2 text-primary dark:text-primary-fixed shrink-0">
+                                        <span class="material-symbols-outlined text-[18px]">phone_android</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="block text-[13px] font-bold text-on-surface dark:text-text-main-dark">Local Only</span>
+                                    </div>
+                                    <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center account-type-indicator transition-all bg-primary border-primary">
+                                        <span class="material-symbols-outlined text-[10px] text-white transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+                                    </div>
+                                </label>
+
+                                <!-- Cloud Sync -->
+                                <label class="flex items-center p-3 bg-surface dark:bg-surface-container-high/20 rounded-xl border border-outline-variant/40 dark:border-outline/20 cursor-pointer transition-all duration-200 hover:bg-surface-container dark:hover:bg-surface-container-high/40 has-[:checked]:bg-income-green-subtle dark:has-[:checked]:bg-primary/20 has-[:checked]:border-primary relative">
+                                    <input class="sr-only" name="account_type" type="radio" value="cloud"/>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center mr-2 text-primary dark:text-primary-fixed shrink-0">
+                                        <span class="material-symbols-outlined text-[18px]">cloud_sync</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="block text-[13px] font-bold text-on-surface dark:text-text-main-dark">Cloud Sync</span>
+                                    </div>
+                                    <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center account-type-indicator transition-all">
+                                        <span class="material-symbols-outlined text-[10px] text-white opacity-0 transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Cloud Password for new profile (Hidden by default, shown when Cloud Sync is selected) -->
+                        <div id="newProfileCloudPasswordSection" class="hidden bg-surface-container-low dark:bg-surface-container-high/40 p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1.5 focus-within:border-primary transition-all">
+                            <label for="newProfileCloudPassword" class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Create Cloud Password</label>
+                            <input type="password" id="newProfileCloudPassword" name="password" placeholder="••••••••" class="bg-transparent border-none p-0 focus:ring-0 w-full text-on-surface dark:text-text-main-dark placeholder:text-outline font-body-md text-body-md focus:outline-none"/>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pb-stack-md pt-4 bg-surface-container-lowest dark:bg-surface-dark">
+                        <button type="button" class="w-full h-touch-target-min bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-surface-tint" id="btnNext3">
+                            Continue
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- Screen 4: Local Account Creation -->
+                <section class="onboarding-screen flex-col min-h-full pt-4 sm:pt-stack-md" id="screen4">
+                    <div class="space-y-stack-sm mb-6 sm:mb-stack-lg text-center">
+                        <div class="w-16 h-16 rounded-full bg-income-green-subtle dark:bg-primary/20 mx-auto flex items-center justify-center mb-4 text-primary dark:text-primary-fixed">
+                            <span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                        </div>
+                        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface dark:text-text-main-dark">Secure your data</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline px-4">Create a simple 4-digit PIN to keep your local financial data safe.</p>
+                    </div>
+                    
+                    <div class="space-y-stack-md flex-1">
+                        <!-- Hidden fields to hold final values -->
+                        <input type="hidden" name="pin" id="finalPin">
+                        
+                        <div class="flex flex-col space-y-4">
+                            <label class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark text-center" for="pinInput">Enter PIN</label>
+                            <!-- Custom PIN input dots, actual input hidden -->
+                            <div class="relative w-full max-w-[240px] mx-auto flex justify-between">
+                                <input aria-label="Enter 4 digit PIN" autocomplete="new-password" class="absolute inset-0 w-full h-full opacity-0 cursor-text z-10" id="pinInput" inputmode="numeric" maxlength="4" pattern="[0-9]*" type="password"/>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit" data-index="0">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit" data-index="1">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit" data-index="2">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit" data-index="3">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col space-y-4 pt-4">
+                            <label class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark text-center opacity-50 transition-opacity" for="pinConfirmInput" id="confirmLabel">Confirm PIN</label>
+                            <div class="relative w-full max-w-[240px] mx-auto flex justify-between opacity-50 transition-opacity pointer-events-none" id="confirmContainer">
+                                <input aria-label="Confirm 4 digit PIN" autocomplete="new-password" class="absolute inset-0 w-full h-full opacity-0 cursor-text z-10" id="pinConfirmInput" inputmode="numeric" maxlength="4" pattern="[0-9]*" type="password"/>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit-confirm" data-index="0">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit-confirm" data-index="1">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit-confirm" data-index="2">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                                <div class="w-12 h-14 bg-surface-container dark:bg-surface-container-high rounded-xl flex items-center justify-center border-2 border-transparent transition-all pin-digit-confirm" data-index="3">
+                                    <span class="text-2xl font-bold"></span>
+                                </div>
+                            </div>
+                            <p class="text-error text-label-sm font-label-sm text-center h-4 mt-1 opacity-0 transition-opacity" id="pinError">PINs do not match.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-auto pb-stack-md pt-4 bg-surface-container-lowest dark:bg-surface-dark">
+                        <button type="submit" class="w-full h-touch-target-min bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-surface-tint" disabled="" id="btnFinish">
+                            <span class="mr-2">Start using MoneyMan</span>
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
+                </section>
+                
+            </div>
+        </form>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const screens = [
+                document.getElementById('screen1'),
+                document.getElementById('screen2'),
+                document.getElementById('screen3'),
+                document.getElementById('screen4')
+            ];
+            let currentScreen = 0;
+            const backBtn = document.getElementById('backBtn');
+            let path = 'new_profile'; // 'cloud_user' or 'new_profile'
+            
+            // Screen 1 Logic
+            const privacyToggle = document.getElementById('privacyToggle');
+            const btnNext1 = document.getElementById('btnNext1');
+
+            privacyToggle.addEventListener('change', (e) => {
+                btnNext1.disabled = !e.target.checked;
+            });
+
+            btnNext1.addEventListener('click', () => navigate(1));
+
+            // Screen 2 Logic (Already a Cloud User?)
+            const cloudUserRadios = document.querySelectorAll('input[name="already_cloud"]');
+            const cloudCredentialsSection = document.getElementById('cloudCredentialsSection');
+            const cloudUsername = document.getElementById('cloudUsername');
+            const cloudPassword = document.getElementById('cloudPassword');
+            const btnNext2 = document.getElementById('btnNext2');
+            
+            const syncEnabledInput = document.getElementById('syncEnabledInput');
+            const hiddenNameInput = document.getElementById('hiddenNameInput');
+            const hiddenPersonaInput = document.getElementById('hiddenPersonaInput');
+
+            cloudUserRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    // Reset all check indicators on screen 2
+                    document.querySelectorAll('#screen2 .check-indicator').forEach(indicator => {
+                        indicator.classList.remove('bg-primary', 'border-primary');
+                        indicator.classList.add('border-outline-variant');
+                        indicator.querySelector('span').classList.add('opacity-0');
+                    });
+
+                    // Set active check indicator
+                    if (radio.checked) {
+                        const parent = radio.closest('label');
+                        const indicator = parent.querySelector('.check-indicator');
+                        indicator.classList.remove('border-outline-variant');
+                        indicator.classList.add('bg-primary', 'border-primary');
+                        indicator.querySelector('span').classList.remove('opacity-0');
+                        
+                        if (radio.value === 'yes') {
+                            path = 'cloud_user';
+                            cloudCredentialsSection.classList.remove('hidden');
+                            cloudUsername.required = true;
+                            cloudPassword.required = true;
+                            cloudUsername.disabled = false;
+                            cloudPassword.disabled = false;
+                            
+                            toggleInputsForPath();
+                            validateScreen2();
+                        } else {
+                            path = 'new_profile';
+                            cloudCredentialsSection.classList.add('hidden');
+                            cloudUsername.required = false;
+                            cloudPassword.required = false;
+                            cloudUsername.disabled = true;
+                            cloudPassword.disabled = true;
+                            cloudUsername.value = '';
+                            cloudPassword.value = '';
+                            
+                            toggleInputsForPath();
+                            btnNext2.disabled = false;
+                        }
+                    }
+                });
+            });
+
+            const screen2Error = document.getElementById('screen2Error');
+            const screen2ErrorText = document.getElementById('screen2ErrorText');
+
+            function showScreen2Error(msg) {
+                if (screen2Error && screen2ErrorText) {
+                    screen2ErrorText.textContent = msg;
+                    screen2Error.classList.remove('hidden');
+                }
+            }
+
+            function hideScreen2Error() {
+                if (screen2Error) {
+                    screen2Error.classList.add('hidden');
+                }
+            }
+
+            function validateScreen2() {
+                hideScreen2Error();
+                if (path === 'cloud_user') {
+                    const userOk = cloudUsername.value.trim() !== '';
+                    const passOk = cloudPassword.value.trim() !== '';
+                    btnNext2.disabled = !(userOk && passOk);
+                    
+                    // Sync values to hidden inputs
+                    hiddenNameInput.value = cloudUsername.value.trim();
+                } else {
+                    btnNext2.disabled = false;
+                }
+            }
+
+            cloudUsername.addEventListener('input', validateScreen2);
+            cloudPassword.addEventListener('input', validateScreen2);
+            
+            btnNext2.addEventListener('click', async () => {
+                if (path === 'cloud_user') {
+                    hideScreen2Error();
+                    btnNext2.disabled = true;
+                    btnNext2.innerHTML = `<span class="material-symbols-outlined animate-spin text-[24px]">progress_activity</span>`;
+                    try {
+                        const res = await fetch('/api/validate-cloud-user', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                username: cloudUsername.value.trim(),
+                                password: cloudPassword.value.trim()
+                            })
+                        });
+                        const data = await res.json();
+                        btnNext2.innerHTML = 'Continue';
+                        btnNext2.disabled = false;
+                        if (res.ok && data.valid) {
+                            navigate(1);
+                        } else {
+                            showScreen2Error(data.error || 'User validation failed.');
+                        }
+                    } catch (err) {
+                        btnNext2.innerHTML = 'Continue';
+                        btnNext2.disabled = false;
+                        showScreen2Error('Network or server error occurred.');
+                    }
+                } else {
+                    navigate(1);
+                }
+            });
+
+            // Screen 3 Logic (Create Profile)
+            const fullName = document.getElementById('fullName');
+            const usernameInput = document.getElementById('usernameInput');
+            const newProfileCloudPassword = document.getElementById('newProfileCloudPassword');
+            const newProfileCloudPasswordSection = document.getElementById('newProfileCloudPasswordSection');
+            const personaRadios = document.querySelectorAll('input[name="persona"]');
+            const profilePic = document.getElementById('profilePic');
+            const accountTypeRadios = document.querySelectorAll('input[name="account_type"]');
+            const btnNext3 = document.getElementById('btnNext3');
+
+            personaRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    // Reset all check indicators for persona cards
+                    document.querySelectorAll('#screen3 .persona-check-indicator').forEach(indicator => {
+                        indicator.classList.remove('bg-primary', 'border-primary');
+                        indicator.classList.add('border-outline-variant');
+                        indicator.querySelector('span').classList.add('opacity-0');
+                    });
+
+                    // Set active check indicator
+                    if (radio.checked) {
+                        const parent = radio.closest('label');
+                        const indicator = parent.querySelector('.persona-check-indicator');
+                        indicator.classList.remove('border-outline-variant');
+                        indicator.classList.add('bg-primary', 'border-primary');
+                        indicator.querySelector('span').classList.remove('opacity-0');
+                    }
+                    validateScreen3();
+                });
+            });
+
+            accountTypeRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    // Reset all check indicators for account type
+                    document.querySelectorAll('#screen3 .account-type-indicator').forEach(indicator => {
+                        indicator.classList.remove('bg-primary', 'border-primary');
+                        indicator.classList.add('border-outline-variant');
+                        indicator.querySelector('span').classList.add('opacity-0');
+                    });
+
+                    // Set active check indicator
+                    if (radio.checked) {
+                        const parent = radio.closest('label');
+                        const indicator = parent.querySelector('.account-type-indicator');
+                        indicator.classList.remove('border-outline-variant');
+                        indicator.classList.add('bg-primary', 'border-primary');
+                        indicator.querySelector('span').classList.remove('opacity-0');
+                        
+                        if (radio.value === 'cloud') {
+                            newProfileCloudPasswordSection.classList.remove('hidden');
+                            newProfileCloudPassword.disabled = false;
+                            newProfileCloudPassword.required = true;
+                            syncEnabledInput.value = 'true';
+                        } else {
+                            newProfileCloudPasswordSection.classList.add('hidden');
+                            newProfileCloudPassword.disabled = true;
+                            newProfileCloudPassword.required = false;
+                            newProfileCloudPassword.value = '';
+                            syncEnabledInput.value = 'false';
+                        }
+                    }
+                    validateScreen3();
+                });
+            });
+
+            function toggleInputsForPath() {
+                if (path === 'cloud_user') {
+                    // Disable screen 3 inputs so they aren't submitted
+                    fullName.disabled = true;
+                    fullName.required = false;
+                    usernameInput.disabled = true;
+                    usernameInput.required = false;
+                    newProfileCloudPassword.disabled = true;
+                    newProfileCloudPassword.required = false;
+                    personaRadios.forEach(r => { r.disabled = true; r.required = false; });
+                    profilePic.disabled = true;
+                    accountTypeRadios.forEach(r => { r.disabled = true; r.required = false; });
+
+                    // Enable screen 2 cloud inputs & hidden inputs
+                    cloudUsername.disabled = false;
+                    cloudPassword.disabled = false;
+                    hiddenNameInput.disabled = false;
+                    hiddenPersonaInput.disabled = false;
+                    syncEnabledInput.value = 'true';
+                } else {
+                    // Enable screen 3 inputs
+                    fullName.disabled = false;
+                    fullName.required = true;
+                    usernameInput.disabled = false;
+                    usernameInput.required = true;
+                    personaRadios.forEach(r => { r.disabled = false; r.required = true; });
+                    profilePic.disabled = false;
+                    accountTypeRadios.forEach(r => { r.disabled = false; r.required = true; });
+
+                    // Disable screen 2 cloud inputs & hidden inputs
+                    cloudUsername.disabled = true;
+                    cloudPassword.disabled = true;
+                    hiddenNameInput.disabled = true;
+                    hiddenPersonaInput.disabled = true;
+                    
+                    // Sync Enabled depends on Account Type selection
+                    const selectedType = document.querySelector('input[name="account_type"]:checked');
+                    if (selectedType && selectedType.value === 'cloud') {
+                        syncEnabledInput.value = 'true';
+                        newProfileCloudPassword.disabled = false;
+                        newProfileCloudPassword.required = true;
+                    } else {
+                        syncEnabledInput.value = 'false';
+                        newProfileCloudPassword.disabled = true;
+                        newProfileCloudPassword.required = false;
+                    }
+                }
+            }
+
+            function validateScreen3() {
+                if (path === 'new_profile') {
+                    const isPersonaSelected = document.querySelector('input[name="persona"]:checked') !== null;
+                    const isNameOk = fullName.value.trim() !== '' && fullName.value.trim().length <= 30;
+                    const isUserOk = usernameInput.value.trim() !== '' && usernameInput.value.trim().length <= 30;
+                    
+                    const selectedType = document.querySelector('input[name="account_type"]:checked');
+                    const isTypeSelected = selectedType !== null;
+                    const isPassOk = !isTypeSelected || (selectedType.value !== 'cloud') || (newProfileCloudPassword.value.trim() !== '');
+                    
+                    btnNext3.disabled = !(isPersonaSelected && isNameOk && isUserOk && isTypeSelected && isPassOk);
+                } else {
+                    btnNext3.disabled = false;
+                }
+            }
+
+            fullName.addEventListener('input', validateScreen3);
+            usernameInput.addEventListener('input', validateScreen3);
+            newProfileCloudPassword.addEventListener('input', validateScreen3);
+            personaRadios.forEach(r => r.addEventListener('change', validateScreen3));
+
+            // Trigger initial validation
+            validateScreen3();
+            btnNext3.addEventListener('click', () => navigate(1));
+
+            // Screen 4 Logic (PIN)
+            const pinInput = document.getElementById('pinInput');
+            const pinConfirmInput = document.getElementById('pinConfirmInput');
+            const pinDigits = document.querySelectorAll('.pin-digit');
+            const pinConfirmDigits = document.querySelectorAll('.pin-digit-confirm');
+            const confirmContainer = document.getElementById('confirmContainer');
+            const confirmLabel = document.getElementById('confirmLabel');
+            const btnFinish = document.getElementById('btnFinish');
+            const pinError = document.getElementById('pinError');
+            const finalPinField = document.getElementById('finalPin');
+
+            function updateVisualPin(inputEl, digitEls) {
+                const val = inputEl.value;
+                digitEls.forEach((el, index) => {
+                    const span = el.querySelector('span');
+                    if (index < val.length) {
+                        span.textContent = '•';
+                        el.classList.add('border-primary', 'bg-surface-light', 'dark:bg-surface-dark');
+                        el.classList.remove('border-transparent', 'bg-surface-container', 'dark:bg-surface-container-high');
+                    } else {
+                        span.textContent = '';
+                        el.classList.remove('border-primary', 'bg-surface-light', 'dark:bg-surface-dark');
+                        el.classList.add('border-transparent', 'bg-surface-container', 'dark:bg-surface-container-high');
+                    }
+                });
+            }
+
+            pinInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '');
+                updateVisualPin(pinInput, pinDigits);
+
+                if (e.target.value.length === 4) {
+                    confirmContainer.classList.remove('opacity-50', 'pointer-events-none');
+                    confirmLabel.classList.remove('opacity-50');
+                    pinConfirmInput.focus();
+                } else {
+                    confirmContainer.classList.add('opacity-50', 'pointer-events-none');
+                    confirmLabel.classList.add('opacity-50');
+                    pinConfirmInput.value = '';
+                    updateVisualPin(pinConfirmInput, pinConfirmDigits);
+                    btnFinish.disabled = true;
+                    pinError.classList.add('opacity-0');
+                }
+            });
+
+            pinConfirmInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '');
+                updateVisualPin(pinConfirmInput, pinConfirmDigits);
+                
+                if (e.target.value.length === 4) {
+                    if (e.target.value === pinInput.value) {
+                        btnFinish.disabled = false;
+                        finalPinField.value = pinInput.value;
+                        pinError.classList.add('opacity-0');
+                    } else {
+                        btnFinish.disabled = true;
+                        pinError.classList.remove('opacity-0');
+                    }
+                } else {
+                    btnFinish.disabled = true;
+                    pinError.classList.add('opacity-0');
+                }
+            });
+
+            // Focus rings
+            pinInput.addEventListener('focus', () => {
+                pinDigits.forEach(d => { if (!d.querySelector('span').textContent) d.classList.add('ring-2', 'ring-primary-container', 'ring-opacity-20'); });
+            });
+            pinInput.addEventListener('blur', () => {
+                pinDigits.forEach(d => d.classList.remove('ring-2', 'ring-primary-container', 'ring-opacity-20'));
+            });
+            pinConfirmInput.addEventListener('focus', () => {
+                pinConfirmDigits.forEach(d => { if (!d.querySelector('span').textContent) d.classList.add('ring-2', 'ring-primary-container', 'ring-opacity-20'); });
+            });
+            pinConfirmInput.addEventListener('blur', () => {
+                pinConfirmDigits.forEach(d => d.classList.remove('ring-2', 'ring-primary-container', 'ring-opacity-20'));
+            });
+
+            // Form Submit Loading State
+            document.getElementById('onboardingForm').addEventListener('submit', (e) => {
+                btnFinish.disabled = true;
+                btnFinish.innerHTML = `<span class="material-symbols-outlined animate-spin text-[24px]">progress_activity</span>`;
+            });
+
+            // Navigation
+            function navigate(direction) {
+                screens[currentScreen].classList.remove('active');
+                
+                if (currentScreen === 1 && direction === 1) {
+                    // Moving forward from screen 2
+                    if (path === 'cloud_user') {
+                        currentScreen = 3; // jump to screen 4
+                    } else {
+                        currentScreen = 2; // go to screen 3
+                    }
+                } else if (currentScreen === 3 && direction === -1) {
+                    // Moving backward from screen 4
+                    if (path === 'cloud_user') {
+                        currentScreen = 1; // jump to screen 2
+                    } else {
+                        currentScreen = 2; // go to screen 3
+                    }
+                } else {
+                    currentScreen += direction;
+                }
+                
+                if (currentScreen > 0) {
+                    backBtn.classList.remove('invisible');
+                } else {
+                    backBtn.classList.add('invisible');
+                }
+
+                setTimeout(() => {
+                    screens[currentScreen].classList.add('active');
+                    if (currentScreen === 3) {
+                        pinInput.focus();
+                    }
+                }, 100);
+            }
+
+            backBtn.addEventListener('click', () => {
+                if (currentScreen > 0) {
+                    navigate(-1);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

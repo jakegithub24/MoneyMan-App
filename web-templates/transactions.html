@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}MoneyMan - All Transactions{% endblock %}
+
+{% set active_page = 'transactions' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-stack-lg">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface dark:text-text-main-dark font-bold">
+                Transactions
+            </h1>
+            <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline mt-1">
+                View, filter, edit, or remove your recorded income and expenses.
+            </p>
+        </div>
+        
+        <a href="{{ url_for('add_transaction') }}" 
+           class="h-touch-target-min px-5 bg-primary text-on-primary rounded-full font-label-lg text-label-lg flex items-center justify-center gap-2 hover:bg-surface-tint shadow-sm transition-colors active:scale-95">
+            <span class="material-symbols-outlined">add</span>
+            <span>Add Transaction</span>
+        </a>
+    </div>
+
+    <!-- Filters Section -->
+    <section class="bg-surface-light dark:bg-surface-dark rounded-2xl p-4 border border-outline-variant/20 shadow-sm flex flex-wrap gap-3 items-center justify-between animate-fade-in-up stagger-1">
+        <div class="flex flex-wrap gap-2">
+            <a href="?type=all&category={{ selected_category }}" 
+               class="h-9 px-4 rounded-full flex items-center justify-center text-xs font-semibold border transition-all hover:scale-[1.02] active:scale-[0.98] {% if selected_type == 'all' %} bg-primary text-on-primary border-primary {% else %} bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:bg-surface-container {% endif %}">
+                All Types
+            </a>
+            <a href="?type=income&category={{ selected_category }}" 
+               class="h-9 px-4 rounded-full flex items-center justify-center text-xs font-semibold border transition-all hover:scale-[1.02] active:scale-[0.98] {% if selected_type == 'income' %} bg-primary-container text-on-primary border-primary {% else %} bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:bg-surface-container {% endif %}">
+                Income only
+            </a>
+            <a href="?type=expense&category={{ selected_category }}" 
+               class="h-9 px-4 rounded-full flex items-center justify-center text-xs font-semibold border transition-all hover:scale-[1.02] active:scale-[0.98] {% if selected_type == 'expense' %} bg-secondary-container text-on-secondary border-secondary {% else %} bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:bg-surface-container {% endif %}">
+                Expense only
+            </a>
+        </div>
+
+        <div>
+            <select onchange="location = this.value;" aria-label="Filter by Category"
+                    class="h-9 px-3 rounded-xl border border-outline-variant/30 bg-surface dark:bg-background-dark text-xs font-semibold text-on-surface dark:text-text-main-dark focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                <option value="?type={{ selected_type }}&category=all" {% if selected_category == 'all' %}selected{% endif %}>All Categories</option>
+                <option value="?type={{ selected_type }}&category=food" {% if selected_category == 'food' %}selected{% endif %}>Food</option>
+                <option value="?type={{ selected_type }}&category=transport" {% if selected_category == 'transport' %}selected{% endif %}>Transport</option>
+                <option value="?type={{ selected_type }}&category=rent" {% if selected_category == 'rent' %}selected{% endif %}>Rent</option>
+                <option value="?type={{ selected_type }}&category=entertainment" {% if selected_category == 'entertainment' %}selected{% endif %}>Entertainment</option>
+                <option value="?type={{ selected_type }}&category=study" {% if selected_category == 'study' %}selected{% endif %}>Study</option>
+                <option value="?type={{ selected_type }}&category=shopping" {% if selected_category == 'shopping' %}selected{% endif %}>Shopping</option>
+                <option value="?type={{ selected_type }}&category=other" {% if selected_category == 'other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- Transactions List -->
+    <section class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden animate-fade-in-up stagger-2">
+        {% if transactions %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container-low dark:bg-surface-container-high/30 border-b border-outline-variant/10 text-on-surface-variant dark:text-outline font-label-sm text-label-sm">
+                        <th class="p-4">Type</th>
+                        <th class="p-4">Category</th>
+                        <th class="p-4">Date</th>
+                        <th class="p-4">Note / Description</th>
+                        <th class="p-4 text-right">Amount</th>
+                        <th class="p-4 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/10">
+                    {% for tx in transactions %}
+                    <tr class="transaction-row hover:bg-surface-container-lowest/50 dark:hover:bg-surface-container/10 transition-all duration-200 hover:scale-[1.005] hover:shadow-sm text-sm select-none animate-fade-in-up stagger-{{ loop.index if loop.index <= 6 else 6 }}"
+                        data-id="{{ tx.id }}"
+                        ondblclick="location.href='/transaction/edit/{{ tx.id }}'"
+                        title="Double-click to edit, swipe left to delete">
+                        <!-- Type Badge -->
+                        <td class="p-4 font-semibold">
+                            {% if tx.type == 'income' %}
+                            <span class="inline-flex items-center gap-1 text-xs text-primary bg-income-green-subtle dark:bg-primary/20 px-2.5 py-1 rounded-full font-bold">
+                                <span class="material-symbols-outlined text-[12px] font-bold">arrow_downward</span>
+                                Income
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1 text-xs text-secondary bg-expense-red-subtle dark:bg-secondary/20 px-2.5 py-1 rounded-full font-bold">
+                                <span class="material-symbols-outlined text-[12px] font-bold">arrow_upward</span>
+                                Expense
+                            </span>
+                            {% endif %}
+                        </td>
+                        <!-- Category with Icon -->
+                        <td class="p-4 capitalize">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-on-surface-variant dark:text-outline text-lg">
+                                    {{ tx.icon }}
+                                </span>
+                                <span>{{ tx.category }}</span>
+                            </div>
+                        </td>
+                        <!-- Date -->
+                        <td class="p-4 text-on-surface-variant dark:text-outline font-medium">
+                            {{ tx.date }}
+                        </td>
+                        <!-- Note -->
+                        <td class="p-4 text-on-surface-variant dark:text-outline max-w-[200px] truncate">
+                            {{ tx.note | default("—") }}
+                        </td>
+                        <!-- Amount -->
+                        <td class="p-4 text-right font-bold text-base {% if tx.type == 'income' %} text-primary dark:text-primary-fixed {% else %} text-secondary {% endif %}">
+                            ₹{{ tx.amount_formatted }}
+                        </td>
+                        <!-- Actions (Edit/Delete) -->
+                        <td class="p-4 text-center">
+                            <div class="inline-flex items-center justify-center gap-2">
+                                <!-- Edit -->
+                                <a href="/transaction/edit/{{ tx.id }}" aria-label="Edit transaction"
+                                   class="w-8 h-8 rounded-full flex items-center justify-center border border-outline-variant/30 text-on-surface-variant dark:text-outline hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors">
+                                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                                </a>
+                                <!-- Delete -->
+                                <form method="POST" action="/transaction/delete/{{ tx.id }}" onsubmit="return confirm('Are you sure you want to delete this transaction?');">
+                                    <button type="submit" aria-label="Delete transaction"
+                                            class="w-8 h-8 rounded-full flex items-center justify-center border border-outline-variant/30 text-error hover:bg-error-container hover:text-on-error-container transition-colors">
+                                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-12 text-center flex flex-col items-center justify-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center text-on-surface-variant dark:text-outline">
+                <span class="material-symbols-outlined text-3xl">payments</span>
+            </div>
+            <div>
+                <h3 class="font-label-lg text-label-lg font-bold text-on-surface dark:text-text-main-dark">No transactions found</h3>
+                <p class="text-xs text-on-surface-variant dark:text-outline mt-1">Try relaxing your filter criteria or record a new transaction.</p>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('.transaction-row');
+        rows.forEach(row => {
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+            const txId = row.dataset.id;
+            
+            row.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+                row.style.transition = '';
+            }, {passive: true});
+
+            row.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                currentX = e.touches[0].clientX;
+                const diffX = currentX - startX;
+                
+                // Only allow left swipe
+                if (diffX < 0) {
+                    const translateX = Math.max(-100, diffX);
+                    row.style.transform = `translateX(${translateX}px)`;
+                    
+                    if (diffX < -70) {
+                        row.style.backgroundColor = 'rgba(186, 26, 26, 0.15)';
+                    } else {
+                        row.style.backgroundColor = '';
+                    }
+                }
+            }, {passive: true});
+
+            row.addEventListener('touchend', (e) => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                const diffX = currentX - startX;
+                
+                row.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease';
+                
+                if (diffX < -80) {
+                    if (confirm('Delete this transaction?')) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/transaction/delete/${txId}`;
+                        document.body.appendChild(form);
+                        form.submit();
+                    } else {
+                        row.style.transform = '';
+                        row.style.backgroundColor = '';
+                    }
+                } else {
+                    row.style.transform = '';
+                    row.style.backgroundColor = '';
+                }
+            });
+
+            // Prevent double-click propagation on action cells
+            const actionsCell = row.querySelector('td:last-child');
+            if (actionsCell) {
+                actionsCell.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

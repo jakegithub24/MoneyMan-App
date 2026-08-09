@@ -1,0 +1,7 @@
+Background color : #131313
+Card background color : #1f271c
+Incomde color : #6c9c3a
+Expense color : #d62b2b
+Text color : #eee9d9
+Base highlight color : #e7c14d
+Pop highlight color : #E67E22

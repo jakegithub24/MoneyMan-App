@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+{% block title %}MoneyMan - EMI Tracker &amp; Calculator{% endblock %}
+
+{% set active_page = 'emi' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-stack-lg">
+    <!-- Header Text -->
+    <div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface dark:text-text-main-dark font-bold">
+            EMI Tracker
+        </h1>
+        <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline mt-1">
+            Calculate your loan repayments, test prepayment impacts, and manage active debts.
+        </p>
+    </div>
+
+    <!-- Section 1: EMI Calculator & Prepayment Impact Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+        
+        <!-- EMI Calculator (Hero Card) -->
+        <section class="bg-surface-light dark:bg-surface-dark rounded-2xl p-card-padding shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] border border-outline-variant/20 flex flex-col justify-between animate-fade-in-up stagger-1">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-fixed flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calculate</span>
+                </div>
+                <h2 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">EMI Calculator</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Amount Input -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-semibold" for="loanAmount">Loan Amount (₹)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline font-body-lg text-body-lg">₹</span>
+                        <input class="w-full h-touch-target-min pl-9 pr-4 rounded-xl border border-outline-variant/30 bg-surface dark:bg-background-dark text-on-surface dark:text-text-main-dark font-body-lg text-body-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" 
+                               id="loanAmount" name="loan_amount" placeholder="e.g. 5,00,000" type="number" value="500000"/>
+                    </div>
+                </div>
+                
+                <!-- Interest & Tenure Inputs row -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-semibold" for="interestRate">Interest Rate (% p.a.)</label>
+                        <div class="relative">
+                            <input class="w-full h-touch-target-min px-4 pr-8 rounded-xl border border-outline-variant/30 bg-surface dark:bg-background-dark text-on-surface dark:text-text-main-dark font-body-lg text-body-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" 
+                                   id="interestRate" name="interest_rate" placeholder="9.5" type="number" step="0.1" value="9.5"/>
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline font-body-lg text-body-lg">%</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-semibold" for="tenure">Tenure (Months)</label>
+                        <input class="w-full h-touch-target-min px-4 rounded-xl border border-outline-variant/30 bg-surface dark:bg-background-dark text-on-surface dark:text-text-main-dark font-body-lg text-body-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" 
+                               id="tenure" name="tenure_months" placeholder="48" type="number" value="48"/>
+                    </div>
+                </div>
+                
+                <!-- Result Card -->
+                <div class="mt-6 bg-income-green-subtle dark:bg-primary/20 rounded-xl p-4 border border-primary/20 flex flex-col items-center justify-center text-center">
+                    <span class="font-label-sm text-label-sm text-on-surface-variant dark:text-outline uppercase tracking-wider mb-1">Estimated Monthly EMI</span>
+                    <div class="font-display-lg text-display-lg text-primary dark:text-primary-fixed font-extrabold" id="emiDisplay">₹12,560</div>
+                    
+                    <button type="button" onclick="openSaveLoanModal()" class="mt-4 w-full h-touch-target-min bg-primary text-on-primary font-label-lg text-label-lg rounded-full shadow-sm hover:bg-surface-tint hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">add</span> 
+                        <span>Save to Tracker</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Prepayment Impact (Bento Style Card) -->
+        <section class="bg-surface-light dark:bg-surface-dark rounded-2xl p-card-padding shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] border border-outline-variant/20 flex flex-col justify-between animate-fade-in-up stagger-2">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">speed</span>
+                    </div>
+                    <h2 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Prepayment Impact</h2>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline mb-6">
+                    See how adding a little extra each month reduces your total tenure and interest paid.
+                </p>
+            </div>
+            
+            <div class="bg-surface-container-low dark:bg-background-dark rounded-xl p-5 border border-outline-variant/20 space-y-4">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant dark:text-outline block mb-1">Extra Monthly Payment</span>
+                        <span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface dark:text-text-main-dark font-bold" id="extraPaymentDisplay">₹1,000</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-label-sm text-label-sm text-on-surface-variant dark:text-outline block mb-1">Time Saved</span>
+                        <span class="font-headline-lg-mobile text-headline-lg-mobile text-secondary font-bold animate-pulse" id="timeSavedDisplay">4 Months</span>
+                    </div>
+                </div>
+                
+                <div class="pt-2 pb-2">
+                    <input aria-label="Extra Monthly Payment Slider" id="prepaymentSlider" max="10000" min="0" step="500" type="range" value="1000"/>
+                    <div class="flex justify-between mt-2 font-label-sm text-label-sm text-on-surface-variant dark:text-outline">
+                        <span>₹0</span>
+                        <span>₹10,000</span>
+                    </div>
+                </div>
+                
+                <div class="pt-4 border-t border-outline-variant/20 flex flex-col sm:flex-row justify-between gap-2">
+                    <span class="font-body-md text-body-md text-on-surface dark:text-text-main-dark">
+                        New Tenure: <strong class="text-primary dark:text-primary-fixed" id="newTenureDisplay">44 Months</strong>
+                    </span>
+                    <span class="font-body-md text-body-md text-on-surface dark:text-text-main-dark">
+                        Interest Saved: <strong class="text-primary dark:text-primary-fixed" id="interestSavedDisplay">₹18,400</strong>
+                    </span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Section 2: Active EMIs List -->
+    <section class="space-y-4 animate-fade-in-up stagger-3">
+        <div class="flex justify-between items-center">
+            <h3 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Active EMIs</h3>
+            <button class="text-primary dark:text-primary-fixed font-label-lg text-label-lg hover:underline">View All</button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+            {% set active_loans = emis | default([
+                {
+                    'name': 'Home Loan',
+                    'bank': 'SBI Bank',
+                    'remaining_months': 120,
+                    'total_months': 180,
+                    'amount': '24,500',
+                    'icon': 'home',
+                    'color': 'bg-tertiary-container'
+                },
+                {
+                    'name': 'Phone EMI',
+                    'bank': 'HDFC Credit Card',
+                    'remaining_months': 4,
+                    'total_months': 24,
+                    'amount': '4,200',
+                    'icon': 'smartphone',
+                    'color': 'bg-primary'
+                }
+            ]) %}
+            
+            {% for loan in active_loans %}
+            {% set progress_percent = ((loan.total_months - loan.remaining_months) / loan.total_months * 100) | round %}
+            <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-4 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex items-center justify-between hover:bg-surface-container-lowest dark:hover:bg-surface-container/10 transition-colors cursor-pointer group animate-fade-in-up stagger-{{ loop.index + 3 if loop.index <= 3 else 6 }}">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-surface-container dark:bg-surface-container-high flex items-center justify-center text-on-surface-variant dark:text-text-main-dark group-hover:bg-primary-container group-hover:text-on-primary transition-all duration-300 group-hover:scale-105">
+                        <span class="material-symbols-outlined transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[15deg]" style="font-variation-settings: 'FILL' 1;">{{ loan.icon }}</span>
+                    </div>
+                    <div>
+                        <h4 class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-bold">{{ loan.name }}</h4>
+                        <span class="text-xs text-on-surface-variant dark:text-outline">{{ loan.bank }} • {{ loan.remaining_months }} months left</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="font-headline-md text-headline-md text-secondary font-bold">₹{{ loan.amount }}</div>
+                    
+                    <!-- Progress of payment -->
+                    <div class="w-24 bg-surface-container dark:bg-surface-container-high h-2 rounded-full mt-1.5 overflow-hidden ml-auto">
+                        <div class="progress-bar-fill {{ loan.color }} h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%;" data-target-width="{{ progress_percent }}%"></div>
+                    </div>
+                    <span class="text-[9px] text-on-surface-variant dark:text-outline mt-0.5 block">{{ progress_percent }}% Paid</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<!-- Save EMI Loan Modal -->
+<div id="saveLoanModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-surface-light dark:bg-surface-dark rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-outline-variant/30 transition-all duration-300 transform scale-95 opacity-0" id="loanModalContent">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-outline-variant/20 bg-surface-container-low dark:bg-surface-container-high/20">
+            <h3 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">Save to Tracker</h3>
+            <button onclick="closeSaveLoanModal()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container text-on-surface-variant dark:text-text-main-dark">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <form method="POST" action="{{ create_emi_url | default('/emi/create') }}" class="p-6 space-y-5">
+            <!-- Hidden inputs pre-filled from calculator -->
+            <input type="hidden" name="amount" id="modalEmiAmount"/>
+            <input type="hidden" name="total_months" id="modalEmiTenure"/>
+            
+            <div class="flex flex-col gap-1.5">
+                <label class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-semibold" for="loanName">Loan Name</label>
+                <input id="loanName" name="name" type="text" placeholder="e.g. Car Loan" required
+                       class="w-full h-touch-target-min px-4 rounded-xl border border-outline-variant/30 bg-surface dark:bg-background-dark text-on-surface dark:text-text-main-dark focus:border-primary focus:ring-1 focus:ring-primary outline-none"/>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="font-label-lg text-label-lg text-on-surface dark:text-text-main-dark font-semibold" for="loanBank">Bank / Lender</label>
+                <input id="loanBank" name="bank" type="text" placeholder="e.g. HDFC Bank" required
+                       class="w-full h-touch-target-min px-4 rounded-xl border border-outline-variant/30 bg-surface dark:bg-background-dark text-on-surface dark:text-text-main-dark focus:border-primary focus:ring-1 focus:ring-primary outline-none"/>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 bg-surface-container-low dark:bg-background-dark p-4 rounded-xl">
+                <div>
+                    <span class="text-xs text-on-surface-variant dark:text-outline block">Monthly Payment</span>
+                    <span class="font-bold text-primary dark:text-primary-fixed" id="modalEmiVal">₹0</span>
+                </div>
+                <div>
+                    <span class="text-xs text-on-surface-variant dark:text-outline block">Tenure</span>
+                    <span class="font-bold text-on-surface dark:text-text-main-dark" id="modalTenureVal">0 Months</span>
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+                <button type="button" onclick="closeSaveLoanModal()" 
+                        class="flex-1 h-touch-target-min border border-outline-variant text-on-surface dark:text-text-main-dark font-label-lg text-label-lg rounded-full hover:bg-surface-container transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="flex-1 h-touch-target-min bg-primary text-on-primary font-label-lg text-label-lg rounded-full hover:bg-surface-tint transition-colors shadow-sm">
+                    Save Loan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loanAmountInput = document.getElementById('loanAmount');
+        const interestRateInput = document.getElementById('interestRate');
+        const tenureInput = document.getElementById('tenure');
+        const emiDisplay = document.getElementById('emiDisplay');
+        
+        const slider = document.getElementById('prepaymentSlider');
+        const extraDisplay = document.getElementById('extraPaymentDisplay');
+        const timeSavedDisplay = document.getElementById('timeSavedDisplay');
+        const newTenureDisplay = document.getElementById('newTenureDisplay');
+        const interestSavedDisplay = document.getElementById('interestSavedDisplay');
+
+        let calculatedEmi = 0;
+
+        function calculateEMI() {
+            const P = parseFloat(loanAmountInput.value) || 0;
+            const annualRate = parseFloat(interestRateInput.value) || 0;
+            const N = parseInt(tenureInput.value) || 0;
+
+            if (P <= 0 || annualRate <= 0 || N <= 0) {
+                emiDisplay.textContent = '₹0';
+                calculatedEmi = 0;
+                return 0;
+            }
+
+            const R = (annualRate / 12) / 100; // monthly rate
+            const emi = P * R * Math.pow(1 + R, N) / (Math.pow(1 + R, N) - 1);
+            
+            calculatedEmi = Math.round(emi);
+            emiDisplay.textContent = `₹${calculatedEmi.toLocaleString('en-IN')}`;
+            return emi;
+        }
+
+        function calculatePrepaymentImpact() {
+            const P = parseFloat(loanAmountInput.value) || 0;
+            const annualRate = parseFloat(interestRateInput.value) || 0;
+            const N = parseInt(tenureInput.value) || 0;
+            const extraPayment = parseFloat(slider.value) || 0;
+
+            extraDisplay.textContent = `₹${Math.round(extraPayment).toLocaleString('en-IN')}`;
+
+            if (P <= 0 || annualRate <= 0 || N <= 0) {
+                timeSavedDisplay.textContent = '0 Months';
+                newTenureDisplay.textContent = '0 Months';
+                interestSavedDisplay.textContent = '₹0';
+                return;
+            }
+
+            const R = (annualRate / 12) / 100; // monthly rate
+            const standardEmi = P * R * Math.pow(1 + R, N) / (Math.pow(1 + R, N) - 1);
+            const totalPaymentWithPrepay = standardEmi + extraPayment;
+
+            // Compute standard total interest
+            const standardTotalPaid = standardEmi * N;
+            const standardTotalInterest = standardTotalPaid - P;
+
+            // Compute new tenure by iterating amortization month-by-month
+            let balance = P;
+            let months = 0;
+            let totalInterestPaidWithPrepay = 0;
+
+            while (balance > 0 && months < N) {
+                const monthlyInterest = balance * R;
+                totalInterestPaidWithPrepay += monthlyInterest;
+                
+                const principalPayment = Math.min(balance, totalPaymentWithPrepay - monthlyInterest);
+                balance -= principalPayment;
+                months++;
+            }
+
+            const monthsSaved = Math.max(0, N - months);
+            const interestSaved = Math.max(0, standardTotalInterest - totalInterestPaidWithPrepay);
+
+            timeSavedDisplay.textContent = `${monthsSaved} Months`;
+            newTenureDisplay.textContent = `${months} Months`;
+            interestSavedDisplay.textContent = `₹${Math.round(interestSaved).toLocaleString('en-IN')}`;
+        }
+
+        // Save Loan modal bindings
+        window.openSaveLoanModal = function() {
+            const modal = document.getElementById('saveLoanModal');
+            const content = document.getElementById('loanModalContent');
+            
+            // Set calculated values into hidden fields
+            document.getElementById('modalEmiAmount').value = calculatedEmi;
+            document.getElementById('modalEmiTenure').value = parseInt(tenureInput.value) || 0;
+            
+            // Set values into visual display labels
+            document.getElementById('modalEmiVal').textContent = `₹${calculatedEmi.toLocaleString('en-IN')}`;
+            document.getElementById('modalTenureVal').textContent = `${tenureInput.value} Months`;
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100', 'pointer-events-auto');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+            setTimeout(() => {
+                document.getElementById('loanName').focus();
+            }, 100);
+        }
+
+        window.closeSaveLoanModal = function() {
+            const modal = document.getElementById('saveLoanModal');
+            const content = document.getElementById('loanModalContent');
+            content.classList.add('scale-95', 'opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100', 'pointer-events-auto');
+        }
+
+        // Close on outside click
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('saveLoanModal');
+            if (e.target === modal) {
+                closeSaveLoanModal();
+            }
+        });
+
+        // Event Listeners
+        [loanAmountInput, interestRateInput, tenureInput].forEach(input => {
+            input.addEventListener('input', () => {
+                calculateEMI();
+                calculatePrepaymentImpact();
+            });
+        });
+
+        slider.addEventListener('input', calculatePrepaymentImpact);
+
+        // Initial calculations
+        calculateEMI();
+        calculatePrepaymentImpact();
+    });
+</script>
+{% endblock %}

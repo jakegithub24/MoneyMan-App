@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}MoneyMan - Monthly AI Analysis{% endblock %}
+
+{% set active_page = 'ai_analysis' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-stack-lg">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface dark:text-text-main-dark font-bold">
+                Monthly AI Insights
+            </h1>
+            <p class="font-body-md text-body-md text-on-surface-variant dark:text-outline mt-1">
+                AI-driven analysis of your spending habits and personalized savings recommendations.
+            </p>
+        </div>
+        
+        <!-- Status indicator -->
+        {% if is_real_ai %}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            Connected to Gemini Flash
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed/30 text-tertiary dark:bg-tertiary/20 dark:text-tertiary-fixed-dim text-xs font-bold"
+              title="To run live API queries, export GEMINI_API_KEY in your shell environment.">
+            <span class="material-symbols-outlined text-xs">info</span>
+            Local Offline Mode
+        </span>
+        {% endif %}
+    </div>
+
+    <!-- Summary metrics block -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+        <div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-outline-variant/20 shadow-sm flex flex-col justify-between">
+            <span class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Total Income</span>
+            <span class="text-2xl font-bold text-primary dark:text-primary-fixed mt-2">₹{{ income_formatted }}</span>
+        </div>
+        <div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-outline-variant/20 shadow-sm flex flex-col justify-between">
+            <span class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Total Expenses</span>
+            <span class="text-2xl font-bold text-secondary mt-2">₹{{ expense_formatted }}</span>
+        </div>
+        <div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-outline-variant/20 shadow-sm flex flex-col justify-between">
+            <span class="text-xs text-on-surface-variant dark:text-outline font-semibold uppercase tracking-wider">Savings Rate</span>
+            <span class="text-2xl font-bold text-on-surface dark:text-text-main-dark mt-2">{{ savings_rate }}%</span>
+        </div>
+    </section>
+
+    <!-- Main analysis report container -->
+    <section class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 md:p-8 border border-outline-variant/20 shadow-sm space-y-6">
+        
+        <div class="flex items-center gap-3 pb-4 border-b border-outline-variant/10">
+            <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center">
+                <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+            </div>
+            <div>
+                <h3 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-text-main-dark">GenAI Financial Review</h3>
+                <p class="text-xs text-on-surface-variant dark:text-outline">Personalized breakdown generated for {{ username }} ({{ user_role }})</p>
+            </div>
+        </div>
+
+        <!-- AI Text analysis content -->
+        <div class="prose dark:prose-invert max-w-none text-on-surface-variant dark:text-outline space-y-6">
+            
+            <!-- Executive Summary -->
+            <div>
+                <h4 class="font-headline-md text-headline-md text-on-surface dark:text-text-main-dark font-bold mb-2">Executive Summary</h4>
+                <p class="text-sm leading-relaxed">
+                    {{ ai_report.summary | safe }}
+                </p>
+            </div>
+
+            <!-- Spending Trends and Observations -->
+            <div>
+                <h4 class="font-headline-md text-headline-md text-on-surface dark:text-text-main-dark font-bold mb-3">Key Observations</h4>
+                <ul class="space-y-3 pl-5 list-disc text-sm">
+                    {% for observation in ai_report.observations %}
+                    <li class="leading-relaxed">{{ observation | safe }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Actionable Recommendations -->
+            <div>
+                <h4 class="font-headline-md text-headline-md text-on-surface dark:text-text-main-dark font-bold mb-3">Actionable Recommendations</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for rec in ai_report.recommendations %}
+                    <div class="p-5 rounded-2xl bg-surface-container-low dark:bg-surface-container-high/20 border border-outline-variant/10 flex gap-4">
+                        <div class="text-primary dark:text-primary-fixed mt-1">
+                            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">{{ rec.icon }}</span>
+                        </div>
+                        <div>
+                            <h5 class="font-label-lg text-label-lg font-bold text-on-surface dark:text-text-main-dark mb-1">{{ rec.title }}</h5>
+                            <p class="text-xs leading-relaxed">{{ rec.text }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        {% if not is_real_ai %}
+        <!-- Setup notice in offline mode -->
+        <div class="mt-8 pt-6 border-t border-outline-variant/15 flex flex-col md:flex-row items-center justify-between gap-4 bg-surface-container-lowest/40 dark:bg-background-dark/30 p-5 rounded-2xl border border-outline-variant/10">
+            <div class="space-y-1">
+                <h4 class="font-label-lg text-label-lg font-bold text-on-surface dark:text-text-main-dark">Want to unlock real-time custom AI?</h4>
+                <p class="text-xs text-on-surface-variant dark:text-outline">You are viewing a smart local evaluation report. Set your API key to connect directly to live Gemini Flash models.</p>
+            </div>
+            <div class="bg-surface-container dark:bg-surface-container-high px-4 py-2.5 rounded-xl font-mono text-xs text-on-surface-variant dark:text-text-main-dark border border-outline-variant/20 shrink-0">
+                export GEMINI_API_KEY="your_api_key_here"
+            </div>
+        </div>
+        {% endif %}
+
+    </section>
+</div>
+{% endblock %}
