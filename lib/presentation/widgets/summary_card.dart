@@ -10,12 +10,18 @@ class SummaryCard extends StatelessWidget {
   final ExpenseSummary summary;
   final DateFilterType filterType;
   final VoidCallback? onSetBudgetTap;
+  final VoidCallback? onIncomeTap;
+  final VoidCallback? onExpenseTap;
+  final VoidCallback? onActivityTap;
 
   const SummaryCard({
     super.key,
     required this.summary,
     required this.filterType,
     this.onSetBudgetTap,
+    this.onIncomeTap,
+    this.onExpenseTap,
+    this.onActivityTap,
   });
 
   @override
@@ -39,55 +45,62 @@ class SummaryCard extends StatelessWidget {
                     children: [
                       // Income Metric Card
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.cardBackgroundColor,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTheme.textColor.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                            onTap: onIncomeTap,
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppTheme.cardBackgroundColor,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.textColor.withValues(alpha: 0.2),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.incomeColor.withValues(alpha: 0.25),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.arrow_downward_rounded,
-                                      color: AppTheme.incomeColor,
-                                      size: 20,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.incomeColor.withValues(alpha: 0.25),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.arrow_downward_rounded,
+                                          color: AppTheme.incomeColor,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Income',
+                                        style: TextStyle(
+                                          color: AppTheme.textColor.withValues(alpha: 0.8),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(height: 12),
                                   Text(
-                                    'Income',
-                                    style: TextStyle(
-                                      color: AppTheme.textColor.withValues(alpha: 0.8),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
+                                    '+$symbol${summary.totalIncome.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      color: AppTheme.incomeColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                '+$symbol${summary.totalIncome.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  color: AppTheme.incomeColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -95,55 +108,62 @@ class SummaryCard extends StatelessWidget {
 
                       // Expense Metric Card
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.cardBackgroundColor,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTheme.textColor.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                            onTap: onExpenseTap,
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppTheme.cardBackgroundColor,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.textColor.withValues(alpha: 0.2),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.expenseColor.withValues(alpha: 0.25),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.arrow_upward_rounded,
-                                      color: AppTheme.expenseColor,
-                                      size: 20,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.expenseColor.withValues(alpha: 0.25),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.arrow_upward_rounded,
+                                          color: AppTheme.expenseColor,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Expense',
+                                        style: TextStyle(
+                                          color: AppTheme.textColor.withValues(alpha: 0.8),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(height: 12),
                                   Text(
-                                    'Expense',
-                                    style: TextStyle(
-                                      color: AppTheme.textColor.withValues(alpha: 0.8),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
+                                    '-$symbol${summary.totalExpense.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      color: AppTheme.expenseColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                '-$symbol${summary.totalExpense.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  color: AppTheme.expenseColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -209,57 +229,64 @@ class SummaryCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
 
-                      // Transactions Count Card
+                      // Transactions Count / Activity Card
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.cardBackgroundColor,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTheme.textColor.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                            onTap: onActivityTap,
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppTheme.cardBackgroundColor,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.textColor.withValues(alpha: 0.2),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.popHighlightColor.withValues(alpha: 0.25),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.receipt_long_rounded,
-                                      color: AppTheme.popHighlightColor,
-                                      size: 20,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.popHighlightColor.withValues(alpha: 0.25),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.receipt_long_rounded,
+                                          color: AppTheme.popHighlightColor,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Activity',
+                                        style: TextStyle(
+                                          color: AppTheme.textColor.withValues(alpha: 0.8),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(height: 12),
                                   Text(
-                                    'Activity',
-                                    style: TextStyle(
-                                      color: AppTheme.textColor.withValues(alpha: 0.8),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
+                                    '${summary.totalCount} records',
+                                    style: const TextStyle(
+                                      color: AppTheme.textColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                '${summary.totalCount} records',
-                                style: const TextStyle(
-                                  color: AppTheme.textColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),

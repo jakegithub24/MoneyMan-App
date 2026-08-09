@@ -110,36 +110,42 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
               children: [
-                // Transaction Type Tabs (All | Expense | Income | Recurring)
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildTypeTab(
-                        label: 'All',
-                        isSelected: _selectedTypeFilter == null && !_onlyRecurringFilter,
-                        onTap: () => _onTypeFilterChanged(null, false),
+                BlocBuilder<ExpenseListCubit, ExpenseListState>(
+                  builder: (context, listState) {
+                    final selectedTypeFilter = listState is ExpenseListLoaded ? listState.selectedType : _selectedTypeFilter;
+                    final onlyRecurringFilter = listState is ExpenseListLoaded ? listState.onlyRecurring : _onlyRecurringFilter;
+
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildTypeTab(
+                            label: 'All',
+                            isSelected: selectedTypeFilter == null && !onlyRecurringFilter,
+                            onTap: () => _onTypeFilterChanged(null, false),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildTypeTab(
+                            label: 'Expenses',
+                            isSelected: selectedTypeFilter == TransactionType.expense && !onlyRecurringFilter,
+                            onTap: () => _onTypeFilterChanged(TransactionType.expense, false),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildTypeTab(
+                            label: 'Income',
+                            isSelected: selectedTypeFilter == TransactionType.income && !onlyRecurringFilter,
+                            onTap: () => _onTypeFilterChanged(TransactionType.income, false),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildTypeTab(
+                            label: 'Recurring',
+                            isSelected: onlyRecurringFilter,
+                            onTap: () => _onTypeFilterChanged(null, true),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      _buildTypeTab(
-                        label: 'Expenses',
-                        isSelected: _selectedTypeFilter == TransactionType.expense && !_onlyRecurringFilter,
-                        onTap: () => _onTypeFilterChanged(TransactionType.expense, false),
-                      ),
-                      const SizedBox(width: 8),
-                      _buildTypeTab(
-                        label: 'Income',
-                        isSelected: _selectedTypeFilter == TransactionType.income && !_onlyRecurringFilter,
-                        onTap: () => _onTypeFilterChanged(TransactionType.income, false),
-                      ),
-                      const SizedBox(width: 8),
-                      _buildTypeTab(
-                        label: 'Recurring',
-                        isSelected: _onlyRecurringFilter,
-                        onTap: () => _onTypeFilterChanged(null, true),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 10),
 

@@ -16,11 +16,13 @@ import 'settings_screen.dart';
 class DashboardScreen extends StatelessWidget {
   final ExpenseRepository repository;
   final VoidCallback onSeeAllPressed;
+  final Function(TransactionType? type)? onNavigateToTransactionsWithFilter;
 
   const DashboardScreen({
     super.key,
     required this.repository,
     required this.onSeeAllPressed,
+    this.onNavigateToTransactionsWithFilter,
   });
 
   @override
@@ -195,6 +197,27 @@ class DashboardScreen extends StatelessWidget {
                   SummaryCard(
                     summary: state.summary,
                     filterType: state.filterType,
+                    onIncomeTap: () {
+                      if (onNavigateToTransactionsWithFilter != null) {
+                        onNavigateToTransactionsWithFilter!(TransactionType.income);
+                      } else {
+                        onSeeAllPressed();
+                      }
+                    },
+                    onExpenseTap: () {
+                      if (onNavigateToTransactionsWithFilter != null) {
+                        onNavigateToTransactionsWithFilter!(TransactionType.expense);
+                      } else {
+                        onSeeAllPressed();
+                      }
+                    },
+                    onActivityTap: () {
+                      if (onNavigateToTransactionsWithFilter != null) {
+                        onNavigateToTransactionsWithFilter!(null);
+                      } else {
+                        onSeeAllPressed();
+                      }
+                    },
                     onSetBudgetTap: () async {
                       final dashboardCubit = context.read<DashboardCubit>();
                       await Navigator.push(

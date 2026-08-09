@@ -194,13 +194,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
                 fontSize: 12,
               ),
             ),
-            trailing: cat.isCustom
-                ? IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.expenseColor),
-                    tooltip: 'Delete Category',
-                    onPressed: () => _deleteCategory(context, cat),
-                  )
-                : const Icon(Icons.lock_rounded, size: 16, color: AppTheme.textColor),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.expenseColor),
+              tooltip: 'Delete Category',
+              onPressed: () => _deleteCategory(context, cat),
+            ),
           ),
         );
       },

@@ -35,6 +35,8 @@ class ExpenseListCubit extends Cubit<ExpenseListState> {
         expenses: list,
         selectedCategory: _currentCategory,
         searchQuery: _currentQuery,
+        selectedType: _currentType,
+        onlyRecurring: _onlyRecurring,
         fromDate: _currentFrom,
         toDate: _currentTo,
       ));

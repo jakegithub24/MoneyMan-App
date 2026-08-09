@@ -97,6 +97,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       DashboardScreen(
         repository: widget.repository,
         onSeeAllPressed: () {
+          context.read<ExpenseListCubit>().setTypeAndRecurringFilter(null, false);
+          setState(() {
+            _currentIndex = 1;
+          });
+        },
+        onNavigateToTransactionsWithFilter: (type) {
+          context.read<ExpenseListCubit>().setTypeAndRecurringFilter(type, false);
           setState(() {
             _currentIndex = 1;
           });

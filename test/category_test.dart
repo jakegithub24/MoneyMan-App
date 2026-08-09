@@ -109,5 +109,14 @@ void main() {
       expect(remaining.length, equals(1));
       expect(remaining.any((c) => c.id == 'cat_custom_2'), isFalse);
     });
+
+    test('User can delete system default category', () async {
+      final initial = await repository.getCategories();
+      expect(initial.any((c) => c.id == '1'), isTrue);
+
+      await repository.deleteCategory('1');
+      final remaining = await repository.getCategories();
+      expect(remaining.isEmpty, isTrue);
+    });
   });
 }
