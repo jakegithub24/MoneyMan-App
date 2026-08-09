@@ -98,36 +98,59 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       setState(() {
-        _errorMessage = 'Please enter your name to continue.';
+        _errorMessage = 'Please enter a username to continue.';
       });
       return;
     }
 
-    if (name.contains(' ') || RegExp(r'\s').hasMatch(name)) {
+    if (RegExp(r'^[_0-9]').hasMatch(name)) {
       setState(() {
-        _errorMessage = 'Username must be a single word (no spaces allowed).';
+        _errorMessage = 'Username must not start with a number or underscore.';
       });
       return;
     }
 
-    if (name.length > 30) {
-      setState(() {
-        _errorMessage = 'Username cannot exceed 30 characters.';
-      });
-      return;
-    }
-
-    await widget.repository.setUserName(name);
-    await widget.repository.setCurrency(_selectedCurrency.code, _selectedCurrency.symbol);
-    try {
-      if (mounted) {
-        context.read<CurrencyCubit>().changeCurrency(_selectedCurrency);
+    final validPattern = RegExp(r'^[a-zA-Z][a-zA-Z0-9_]{0,9}$');
+    if (!validPattern.hasMatch(name)) {
+      if (name.length > 10) {
+        setState(() {
+          _errorMessage = 'Username cannot exceed 10 characters.';
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'Username can only contain letters, numbers, and underscores.';
+        });
       }
-    } catch (_) {}
-    await widget.repository.setOnboardingCompleted(true);
+      return;
+    }
 
-    if (mounted) {
-      widget.onCompleted();
+    setState(() {
+      _errorMessage = null;
+    });
+
+    final selectedCode = _selectedCurrency.code;
+    final selectedSymbol = _selectedCurrency.symbol;
+
+    try {
+      await widget.repository.setUserName(name);
+      await widget.repository.setCurrency(selectedCode, selectedSymbol);
+      await widget.repository.setOnboardingCompleted(true);
+
+      try {
+        if (mounted) {
+          context.read<CurrencyCubit>().changeCurrency(_selectedCurrency);
+        }
+      } catch (_) {}
+
+      if (mounted) {
+        widget.onCompleted();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to save settings: $e';
+        });
+      }
     }
   }
 
@@ -297,134 +320,165 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildProfilePage() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.baseHighlightColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Icon(
-                Icons.person_pin_rounded,
-                color: AppTheme.baseHighlightColor,
-                size: 44,
-              ),
-            ),
-            const SizedBox(height: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppTheme.baseHighlightColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.person_pin_rounded,
+                      color: AppTheme.baseHighlightColor,
+                      size: 40,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-            const Text(
-              'Profile & Currency Setup',
-              style: TextStyle(
-                color: AppTheme.textColor,
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Set your username and select your preferred account currency. Currency cannot be changed later.',
-              style: TextStyle(
-                color: AppTheme.textColor.withValues(alpha: 0.8),
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 28),
+                  const Text(
+                    'Profile & Currency Setup',
+                    style: TextStyle(
+                      color: AppTheme.textColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Set your username and select your preferred account currency. Currency cannot be changed later.',
+                    style: TextStyle(
+                      color: AppTheme.textColor.withValues(alpha: 0.8),
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-            // Username Section
-            const Text(
-              'USERNAME',
-              style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _nameController,
-              maxLength: 30,
-              inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-              textCapitalization: TextCapitalization.words,
-              style: const TextStyle(color: AppTheme.textColor, fontSize: 16, fontWeight: FontWeight.bold),
-              decoration: InputDecoration(
-                hintText: 'Single-word name (max 30 chars)',
-                prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
-                filled: true,
-                fillColor: AppTheme.cardBackgroundColor,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: AppTheme.textColor.withValues(alpha: 0.3)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppTheme.baseHighlightColor, width: 2),
-                ),
-              ),
-              onSubmitted: (_) => _submitProfileAndComplete(),
-            ),
-            const SizedBox(height: 16),
+                  // Username Section
+                  const Text(
+                    'USERNAME',
+                    style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _nameController,
+                    maxLength: 10,
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]'))],
+                    style: const TextStyle(color: AppTheme.textColor, fontSize: 16, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      hintText: 'Username (A-Z, a-z, 0-9, _, max 10 chars)',
+                      prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
+                      filled: true,
+                      fillColor: AppTheme.cardBackgroundColor,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide(
+                          color: _errorMessage != null
+                              ? AppTheme.expenseColor
+                              : AppTheme.textColor.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: AppTheme.baseHighlightColor, width: 2),
+                      ),
+                    ),
+                    onChanged: (_) {
+                      if (_errorMessage != null) {
+                        setState(() {
+                          _errorMessage = null;
+                        });
+                      }
+                    },
+                    onSubmitted: (_) => _submitProfileAndComplete(),
+                  ),
+                  const SizedBox(height: 16),
 
-            // Currency Selector Section
-            const Text(
-              'ACCOUNT CURRENCY (FIXED)',
-              style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-            ),
-            const SizedBox(height: 8),
-            Card(
-              color: AppTheme.cardBackgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: BorderSide(color: AppTheme.textColor.withValues(alpha: 0.3)),
-              ),
-              child: ListTile(
-                leading: Text(
-                  _selectedCurrency.flag,
-                  style: const TextStyle(fontSize: 28),
-                ),
-                title: Text(
-                  '${_selectedCurrency.name} (${_selectedCurrency.symbol})',
-                  style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                subtitle: Text(
-                  'Code: ${_selectedCurrency.code}',
-                  style: TextStyle(color: AppTheme.textColor.withValues(alpha: 0.7), fontSize: 12),
-                ),
-                trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textColor),
-                onTap: _openCurrencyPicker,
-              ),
-            ),
+                  // Currency Selector Section
+                  const Text(
+                    'ACCOUNT CURRENCY (FIXED)',
+                    style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                  ),
+                  const SizedBox(height: 8),
+                  Card(
+                    color: AppTheme.cardBackgroundColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      side: BorderSide(color: AppTheme.textColor.withValues(alpha: 0.3)),
+                    ),
+                    child: ListTile(
+                      leading: Text(
+                        _selectedCurrency.flag,
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                      title: Text(
+                        '${_selectedCurrency.name} (${_selectedCurrency.symbol})',
+                        style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      subtitle: Text(
+                        'Code: ${_selectedCurrency.code}',
+                        style: TextStyle(color: AppTheme.textColor.withValues(alpha: 0.7), fontSize: 12),
+                      ),
+                      trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textColor),
+                      onTap: _openCurrencyPicker,
+                    ),
+                  ),
 
-            if (_errorMessage != null) ...[
-              const SizedBox(height: 16),
-              Text(
-                _errorMessage!,
-                style: const TextStyle(color: AppTheme.expenseColor, fontSize: 13, fontWeight: FontWeight.w600),
-              ),
-            ],
-
-            const SizedBox(height: 36),
-
-            // Submit & Finish Button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.baseHighlightColor,
-                  foregroundColor: AppTheme.backgroundColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-                onPressed: _submitProfileAndComplete,
-                child: const Text(
-                  'Get Started',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.expenseColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppTheme.expenseColor.withValues(alpha: 0.5)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline_rounded, color: AppTheme.expenseColor, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _errorMessage ?? '',
+                              style: const TextStyle(color: AppTheme.expenseColor, fontSize: 13, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Submit & Finish Button Always Visible
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.baseHighlightColor,
+                foregroundColor: AppTheme.backgroundColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: _submitProfileAndComplete,
+              child: const Text(
+                'Get Started',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

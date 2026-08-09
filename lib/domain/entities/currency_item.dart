@@ -26,10 +26,13 @@ class CurrencyItem {
     CurrencyItem(code: 'RUB', symbol: '₽', name: 'Russian Ruble', flag: '🇷🇺'),
   ];
 
-  static CurrencyItem getByCode(String code) {
+  static CurrencyItem getByCode(String? code) {
+    if (code == null || code.trim().isEmpty) {
+      return availableCurrencies.first;
+    }
     return availableCurrencies.firstWhere(
-      (c) => c.code.toUpperCase() == code.toUpperCase(),
-      orElse: () => availableCurrencies.first, // Default INR
+      (c) => c.code.toUpperCase() == code.trim().toUpperCase(),
+      orElse: () => availableCurrencies.first,
     );
   }
 }

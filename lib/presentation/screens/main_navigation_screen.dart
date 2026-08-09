@@ -146,6 +146,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
           ),
         ),
       );
+      if (mounted) {
+        context.read<DashboardCubit>().loadDashboard();
+        context.read<ExpenseListCubit>().loadExpenses();
+      }
     }
 
     final lockEnabled = await widget.repository.isSecurityLockEnabled();

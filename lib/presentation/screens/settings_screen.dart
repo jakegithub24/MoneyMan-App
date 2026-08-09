@@ -141,19 +141,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Enter single-word username (max 30 characters):',
+                'Enter username (A-Z, a-z, 0-9, _, max 10 chars):',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 13),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: controller,
-                maxLength: 30,
-                inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-                textCapitalization: TextCapitalization.words,
+                maxLength: 10,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]'))],
                 style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
-                  hintText: 'e.g. Alex',
+                  hintText: 'e.g. Alex_99',
                   errorText: errorText,
                 ),
               ),
@@ -177,16 +176,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   });
                   return;
                 }
-                if (name.contains(' ') || RegExp(r'\s').hasMatch(name)) {
+                if (RegExp(r'^[_0-9]').hasMatch(name)) {
                   setDialogState(() {
-                    errorText = 'Username must be a single word (no spaces)';
+                    errorText = 'Username must not start with number or underscore';
                   });
                   return;
                 }
-                if (name.length > 30) {
-                  setDialogState(() {
-                    errorText = 'Name cannot exceed 30 characters';
-                  });
+                final validPattern = RegExp(r'^[a-zA-Z][a-zA-Z0-9_]{0,9}$');
+                if (!validPattern.hasMatch(name)) {
+                  if (name.length > 10) {
+                    setDialogState(() {
+                      errorText = 'Name cannot exceed 10 characters';
+                    });
+                  } else {
+                    setDialogState(() {
+                      errorText = 'Only letters, numbers, and underscores allowed';
+                    });
+                  }
                   return;
                 }
                 Navigator.pop(ctx, name);

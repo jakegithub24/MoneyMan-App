@@ -130,12 +130,20 @@ class ExpenseHiveDatasource {
 
   Future<String> getCurrencyCode() async {
     final sBox = await settingsBox;
-    return sBox.get('currency_code', defaultValue: 'INR') as String;
+    final val = sBox.get('currency_code');
+    if (val == null || val is! String || val.trim().isEmpty) {
+      return 'INR';
+    }
+    return val.trim();
   }
 
   Future<String> getCurrencySymbol() async {
     final sBox = await settingsBox;
-    return sBox.get('currency_symbol', defaultValue: '₹') as String;
+    final val = sBox.get('currency_symbol');
+    if (val == null || val is! String || val.trim().isEmpty) {
+      return '₹';
+    }
+    return val.trim();
   }
 
   Future<void> setCurrency(String code, String symbol) async {
@@ -146,7 +154,11 @@ class ExpenseHiveDatasource {
 
   Future<String?> getUserName() async {
     final sBox = await settingsBox;
-    return sBox.get('user_name') as String?;
+    final val = sBox.get('user_name');
+    if (val == null || val is! String || val.trim().isEmpty) {
+      return null;
+    }
+    return val.trim();
   }
 
   Future<void> setUserName(String name) async {
