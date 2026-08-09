@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/currency_item.dart';
 import '../state/currency/currency_cubit.dart';
-import '../state/currency/currency_state.dart';
 import '../state/dashboard/dashboard_cubit.dart';
 import '../theme/app_theme.dart';
 
 class CurrencySelectorDialog extends StatefulWidget {
-  const CurrencySelectorDialog({super.key});
+  final CurrencyItem? initialCurrency;
+  final ValueChanged<CurrencyItem>? onSelected;
+
+  const CurrencySelectorDialog({
+    super.key,
+    this.initialCurrency,
+    this.onSelected,
+  });
 
   @override
   State<CurrencySelectorDialog> createState() => _CurrencySelectorDialogState();
@@ -25,6 +31,15 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    String activeCode = widget.initialCurrency?.code ?? '';
+    if (activeCode.isEmpty) {
+      try {
+        activeCode = context.read<CurrencyCubit>().state.currency.code;
+      } catch (_) {
+        activeCode = 'INR';
+      }
+    }
+
     return Dialog(
       backgroundColor: AppTheme.cardBackgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -74,10 +89,8 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
 
             // Currencies List
             Expanded(
-              child: BlocBuilder<CurrencyCubit, CurrencyState>(
-                builder: (context, state) {
-                  final activeCode = state.currency.code;
-
+              child: Builder(
+                builder: (context) {
                   final filtered = CurrencyItem.availableCurrencies.where((c) {
                     if (_filter.isEmpty) return true;
                     return c.code.toLowerCase().contains(_filter) ||
@@ -116,12 +129,19 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
                         ),
                         child: ListTile(
                           onTap: () async {
-                            final currencyCubit = context.read<CurrencyCubit>();
-                            final dashboardCubit = context.read<DashboardCubit>();
-                            await currencyCubit.changeCurrency(item);
-                            dashboardCubit.loadDashboard();
-                            if (context.mounted) {
-                              Navigator.pop(context);
+                            if (widget.onSelected != null) {
+                              widget.onSelected!(item);
+                              Navigator.pop(context, item);
+                            } else {
+                              try {
+                                final currencyCubit = context.read<CurrencyCubit>();
+                                final dashboardCubit = context.read<DashboardCubit>();
+                                await currencyCubit.changeCurrency(item);
+                                dashboardCubit.loadDashboard();
+                              } catch (_) {}
+                              if (context.mounted) {
+                                Navigator.pop(context, item);
+                              }
                             }
                           },
                           leading: Text(

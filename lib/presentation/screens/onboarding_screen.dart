@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../domain/entities/currency_item.dart';
 import '../../domain/repositories/expense_repository.dart';
+import '../state/currency/currency_cubit.dart';
 import '../theme/app_theme.dart';
+import '../widgets/currency_selector_dialog.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final ExpenseRepository repository;
@@ -23,19 +27,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final TextEditingController _nameController = TextEditingController();
   int _currentPage = 0;
   String? _errorMessage;
+  CurrencyItem _selectedCurrency = CurrencyItem.availableCurrencies.first;
 
   static const String githubUrl = 'https://github.com/jakegithub24/MoneyMan-App';
 
   @override
   void initState() {
     super.initState();
-    _loadExistingUserName();
+    _loadExistingProfile();
   }
 
-  Future<void> _loadExistingUserName() async {
+  Future<void> _loadExistingProfile() async {
     final name = await widget.repository.getUserName();
     if (name != null && name.isNotEmpty) {
       _nameController.text = name;
+    }
+    final code = await widget.repository.getCurrencyCode();
+    if (mounted) {
+      setState(() {
+        _selectedCurrency = CurrencyItem.getByCode(code);
+      });
     }
   }
 
@@ -64,7 +75,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  Future<void> _submitNameAndComplete() async {
+  Future<void> _openCurrencyPicker() async {
+    final selected = await showDialog<CurrencyItem>(
+      context: context,
+      builder: (ctx) => CurrencySelectorDialog(
+        initialCurrency: _selectedCurrency,
+        onSelected: (item) {
+          setState(() {
+            _selectedCurrency = item;
+          });
+        },
+      ),
+    );
+    if (selected != null) {
+      setState(() {
+        _selectedCurrency = selected;
+      });
+    }
+  }
+
+  Future<void> _submitProfileAndComplete() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       setState(() {
@@ -88,6 +118,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     await widget.repository.setUserName(name);
+    await widget.repository.setCurrency(_selectedCurrency.code, _selectedCurrency.symbol);
+    try {
+      if (mounted) {
+        context.read<CurrencyCubit>().changeCurrency(_selectedCurrency);
+      }
+    } catch (_) {}
     await widget.repository.setOnboardingCompleted(true);
 
     if (mounted) {
@@ -135,7 +171,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 children: [
                   _buildWelcomePage(),
-                  _buildUserNamePage(),
+                  _buildProfilePage(),
                 ],
               ),
             ),
@@ -200,9 +236,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 _FeatureRow(icon: Icons.pie_chart_rounded, text: 'Visual Spending Breakdown & Categories'),
                 SizedBox(height: 12),
-                _FeatureRow(icon: Icons.currency_exchange_rounded, text: 'Multi-Currency Support (INR, USD, EUR, JPY)'),
+                _FeatureRow(icon: Icons.currency_exchange_rounded, text: 'Account Currency Setup (Fixed on Setup)'),
                 SizedBox(height: 12),
-                _FeatureRow(icon: Icons.lock_rounded, text: 'PIN Security Lock & Privacy Controls'),
+                _FeatureRow(icon: Icons.lock_rounded, text: 'PIN Security Lock & Auto-Lock Controls'),
                 SizedBox(height: 12),
                 _FeatureRow(icon: Icons.import_export_rounded, text: 'Custom Category Management & CSV Export/Import'),
               ],
@@ -259,99 +295,136 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildUserNamePage() {
+  Widget _buildProfilePage() {
     return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.baseHighlightColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(
-              Icons.badge_rounded,
-              color: AppTheme.baseHighlightColor,
-              size: 44,
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          const Text(
-            'What should we call you?',
-            style: TextStyle(
-              color: AppTheme.textColor,
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Enter your name to personalize your MoneyMan dashboard.',
-            style: TextStyle(
-              color: AppTheme.textColor.withValues(alpha: 0.8),
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 28),
-
-          // Name Input Text Field
-          TextField(
-            controller: _nameController,
-            maxLength: 30,
-            inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-            textCapitalization: TextCapitalization.words,
-            style: const TextStyle(color: AppTheme.textColor, fontSize: 16, fontWeight: FontWeight.bold),
-            decoration: InputDecoration(
-              hintText: 'Enter single-word username (max 30 chars)',
-              prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
-              filled: true,
-              fillColor: AppTheme.cardBackgroundColor,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: AppTheme.textColor.withValues(alpha: 0.3)),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.baseHighlightColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppTheme.baseHighlightColor, width: 2),
+              child: const Icon(
+                Icons.person_pin_rounded,
+                color: AppTheme.baseHighlightColor,
+                size: 44,
               ),
             ),
-            onSubmitted: (_) => _submitNameAndComplete(),
-          ),
+            const SizedBox(height: 24),
 
-          if (_errorMessage != null) ...[
-            const SizedBox(height: 12),
+            const Text(
+              'Profile & Currency Setup',
+              style: TextStyle(
+                color: AppTheme.textColor,
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
             Text(
-              _errorMessage!,
-              style: const TextStyle(color: AppTheme.expenseColor, fontSize: 13, fontWeight: FontWeight.w600),
+              'Set your username and select your preferred account currency. Currency cannot be changed later.',
+              style: TextStyle(
+                color: AppTheme.textColor.withValues(alpha: 0.8),
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            // Username Section
+            const Text(
+              'USERNAME',
+              style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _nameController,
+              maxLength: 30,
+              inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+              textCapitalization: TextCapitalization.words,
+              style: const TextStyle(color: AppTheme.textColor, fontSize: 16, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                hintText: 'Single-word name (max 30 chars)',
+                prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
+                filled: true,
+                fillColor: AppTheme.cardBackgroundColor,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: AppTheme.textColor.withValues(alpha: 0.3)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppTheme.baseHighlightColor, width: 2),
+                ),
+              ),
+              onSubmitted: (_) => _submitProfileAndComplete(),
+            ),
+            const SizedBox(height: 16),
+
+            // Currency Selector Section
+            const Text(
+              'ACCOUNT CURRENCY (FIXED)',
+              style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            ),
+            const SizedBox(height: 8),
+            Card(
+              color: AppTheme.cardBackgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: BorderSide(color: AppTheme.textColor.withValues(alpha: 0.3)),
+              ),
+              child: ListTile(
+                leading: Text(
+                  _selectedCurrency.flag,
+                  style: const TextStyle(fontSize: 28),
+                ),
+                title: Text(
+                  '${_selectedCurrency.name} (${_selectedCurrency.symbol})',
+                  style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                subtitle: Text(
+                  'Code: ${_selectedCurrency.code}',
+                  style: TextStyle(color: AppTheme.textColor.withValues(alpha: 0.7), fontSize: 12),
+                ),
+                trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textColor),
+                onTap: _openCurrencyPicker,
+              ),
+            ),
+
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage!,
+                style: const TextStyle(color: AppTheme.expenseColor, fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ],
+
+            const SizedBox(height: 36),
+
+            // Submit & Finish Button
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.baseHighlightColor,
+                  foregroundColor: AppTheme.backgroundColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: _submitProfileAndComplete,
+                child: const Text(
+                  'Get Started',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
           ],
-
-          const Spacer(),
-
-          // Submit & Finish Button
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.baseHighlightColor,
-                foregroundColor: AppTheme.backgroundColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              onPressed: _submitNameAndComplete,
-              child: const Text(
-                'Get Started',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

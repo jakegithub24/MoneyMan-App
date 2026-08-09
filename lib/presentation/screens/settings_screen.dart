@@ -8,7 +8,6 @@ import '../state/currency/currency_state.dart';
 import '../state/dashboard/dashboard_cubit.dart';
 import '../state/expense_list/expense_list_cubit.dart';
 import '../theme/app_theme.dart';
-import '../widgets/currency_selector_dialog.dart';
 import '../widgets/export_data_dialog.dart';
 import '../widgets/import_data_dialog.dart';
 import 'categories_screen.dart';
@@ -343,43 +342,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
               onTap: _updateUsernameDialog,
             ),
-          ),
-          const SizedBox(height: 24),
-
-          // Preferences Section
-          _buildSectionHeader('PREFERENCES'),
-          BlocBuilder<CurrencyCubit, CurrencyState>(
-            builder: (context, state) {
-              final currency = state.currency;
-              return Card(
-                color: AppTheme.cardBackgroundColor,
-                child: ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppTheme.popHighlightColor.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.currency_exchange_rounded, color: AppTheme.popHighlightColor),
-                  ),
-                  title: const Text(
-                    'Currency',
-                    style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    '${currency.flag} ${currency.name} (${currency.symbol} - ${currency.code})',
-                    style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
-                  ),
-                  trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const CurrencySelectorDialog(),
-                    );
-                  },
-                ),
-              );
-            },
           ),
           const SizedBox(height: 24),
 
