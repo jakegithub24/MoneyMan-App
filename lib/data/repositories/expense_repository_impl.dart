@@ -103,6 +103,18 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<void> setCurrency(String code, String symbol) => datasource.setCurrency(code, symbol);
 
   @override
+  Future<String?> getUserName() => datasource.getUserName();
+
+  @override
+  Future<void> setUserName(String name) => datasource.setUserName(name);
+
+  @override
+  Future<bool> isOnboardingCompleted() => datasource.isOnboardingCompleted();
+
+  @override
+  Future<void> setOnboardingCompleted(bool completed) => datasource.setOnboardingCompleted(completed);
+
+  @override
   Future<String> exportToCsv({
     TransactionType? type,
     DateTime? from,

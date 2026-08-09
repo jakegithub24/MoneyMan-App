@@ -106,6 +106,21 @@ class InMemoryExpenseRepository implements ExpenseRepository {
     _currencySymbol = symbol;
   }
 
+  String? _userName;
+  bool _onboardingCompleted = false;
+
+  @override
+  Future<String?> getUserName() async => _userName;
+
+  @override
+  Future<void> setUserName(String name) async => _userName = name;
+
+  @override
+  Future<bool> isOnboardingCompleted() async => _onboardingCompleted;
+
+  @override
+  Future<void> setOnboardingCompleted(bool completed) async => _onboardingCompleted = completed;
+
   @override
   Future<String> exportToCsv({
     TransactionType? type,
@@ -190,11 +205,13 @@ class InMemoryExpenseRepository implements ExpenseRepository {
   @override
   Future<void> resetDatabase() async {
     _expenses.clear();
-    _budget = 1500.0;
+    _budget = 0.0;
     _currencyCode = 'INR';
     _currencySymbol = '₹';
     _securityPin = null;
     _lockEnabled = false;
+    _userName = null;
+    _onboardingCompleted = false;
   }
 }
 
@@ -369,6 +386,21 @@ void main() {
       expect(list, isEmpty);
       expect(await repository.isSecurityLockEnabled(), isFalse);
       expect(await repository.getSecurityPin(), isNull);
+    });
+
+    test('User onboarding and username setting workflow', () async {
+      expect(await repository.isOnboardingCompleted(), isFalse);
+      expect(await repository.getUserName(), isNull);
+
+      await repository.setUserName('Alex');
+      await repository.setOnboardingCompleted(true);
+
+      expect(await repository.isOnboardingCompleted(), isTrue);
+      expect(await repository.getUserName(), equals('Alex'));
+
+      // Database reset clears onboarding state
+      await repository.resetDatabase();
+      expect(await repository.isOnboardingCompleted(), isFalse);
     });
   });
 }

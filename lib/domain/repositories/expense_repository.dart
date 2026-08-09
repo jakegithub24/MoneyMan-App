@@ -37,6 +37,12 @@ abstract class ExpenseRepository {
   Future<String> getCurrencySymbol();
   Future<void> setCurrency(String code, String symbol);
 
+  // User Profile & Onboarding Management
+  Future<String?> getUserName();
+  Future<void> setUserName(String name);
+  Future<bool> isOnboardingCompleted();
+  Future<void> setOnboardingCompleted(bool completed);
+
   // CSV Export Utilities
   Future<String> exportToCsv({
     TransactionType? type,

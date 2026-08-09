@@ -11,6 +11,8 @@ import '../widgets/currency_selector_dialog.dart';
 import '../widgets/export_data_dialog.dart';
 import '../widgets/import_data_dialog.dart';
 import 'categories_screen.dart';
+import 'main_navigation_screen.dart';
+import 'onboarding_screen.dart';
 import 'security_pin_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -437,11 +439,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       context.read<ExpenseListCubit>().loadExpenses();
                       context.read<CurrencyCubit>().loadCurrency();
                       widget.onSettingsUpdated();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Database reset successfully. App started from scratch.', style: TextStyle(color: AppTheme.textColor)),
-                          backgroundColor: AppTheme.cardBackgroundColor,
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => OnboardingScreen(
+                            repository: widget.repository,
+                            onCompleted: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MainNavigationScreen(repository: widget.repository),
+                                ),
+                              );
+                            },
+                          ),
                         ),
+                        (route) => false,
                       );
                     }
                   }

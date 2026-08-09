@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import 'dashboard_screen.dart';
 import 'expense_form_screen.dart';
 import 'expense_list_screen.dart';
+import 'onboarding_screen.dart';
 import 'security_pin_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -32,6 +33,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Future<void> _checkAppLock() async {
+    final onboardingCompleted = await widget.repository.isOnboardingCompleted();
+    if (!onboardingCompleted) {
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OnboardingScreen(
+            repository: widget.repository,
+            onCompleted: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      );
+    }
+
     final lockEnabled = await widget.repository.isSecurityLockEnabled();
     final pin = await widget.repository.getSecurityPin();
 
@@ -48,17 +65,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
 
       if (success == true) {
-        setState(() {
-          _isUnlocked = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isUnlocked = true;
+          });
+        }
       } else {
-        // Retry unlock
         _checkAppLock();
       }
     } else {
-      setState(() {
-        _isUnlocked = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isUnlocked = true;
+        });
+      }
     }
   }
 

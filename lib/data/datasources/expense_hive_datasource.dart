@@ -1,6 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../domain/entities/expense.dart';
-import '../../domain/entities/transaction_type.dart';
 
 class ExpenseHiveDatasource {
   static const String boxName = 'expenses_box';
@@ -27,102 +26,15 @@ class ExpenseHiveDatasource {
   }
 
   Future<void> _seedInitialDataIfNeeded(Box<Map> box) async {
-    if (box.isNotEmpty) return;
-
-    final now = DateTime.now();
-    final sampleExpenses = [
-      Expense(
-        id: '1',
-        amount: 3500.00,
-        category: 'Salary',
-        type: TransactionType.income,
-        date: now.subtract(const Duration(days: 7)),
-        note: 'Monthly Salary Paycheck',
-        paymentMethod: 'Bank Transfer',
-        isRecurring: true,
-        recurringInterval: RecurringInterval.monthly,
-        createdAt: now.subtract(const Duration(days: 7)),
-        updatedAt: now.subtract(const Duration(days: 7)),
-      ),
-      Expense(
-        id: '2',
-        amount: 450.00,
-        category: 'Freelance',
-        type: TransactionType.income,
-        date: now.subtract(const Duration(days: 2)),
-        note: 'UI Design Contract',
-        paymentMethod: 'UPI / Digital Wallet',
-        createdAt: now.subtract(const Duration(days: 2)),
-        updatedAt: now.subtract(const Duration(days: 2)),
-      ),
-      Expense(
-        id: '3',
-        amount: 145.50,
-        category: 'Food',
-        type: TransactionType.expense,
-        date: now.subtract(const Duration(hours: 3)),
-        note: 'Supermarket Groceries',
-        paymentMethod: 'Credit Card',
-        createdAt: now.subtract(const Duration(hours: 3)),
-        updatedAt: now.subtract(const Duration(hours: 3)),
-      ),
-      Expense(
-        id: '4',
-        amount: 15.00,
-        category: 'Transport',
-        type: TransactionType.expense,
-        date: now.subtract(const Duration(days: 1)),
-        note: 'City Metro Pass',
-        paymentMethod: 'UPI / Digital Wallet',
-        createdAt: now.subtract(const Duration(days: 1)),
-        updatedAt: now.subtract(const Duration(days: 1)),
-      ),
-      Expense(
-        id: '5',
-        amount: 89.99,
-        category: 'Shopping',
-        type: TransactionType.expense,
-        date: now.subtract(const Duration(days: 3)),
-        note: 'Running Shoes Sale',
-        paymentMethod: 'Credit Card',
-        createdAt: now.subtract(const Duration(days: 3)),
-        updatedAt: now.subtract(const Duration(days: 3)),
-      ),
-      Expense(
-        id: '6',
-        amount: 120.00,
-        category: 'Utilities',
-        type: TransactionType.expense,
-        date: now.subtract(const Duration(days: 5)),
-        note: 'Electricity Bill',
-        paymentMethod: 'Bank Transfer',
-        isRecurring: true,
-        recurringInterval: RecurringInterval.monthly,
-        createdAt: now.subtract(const Duration(days: 5)),
-        updatedAt: now.subtract(const Duration(days: 5)),
-      ),
-      Expense(
-        id: '7',
-        amount: 28.75,
-        category: 'Entertainment',
-        type: TransactionType.expense,
-        date: now.subtract(const Duration(days: 6)),
-        note: 'Movie Cinema Tickets',
-        paymentMethod: 'Cash',
-        createdAt: now.subtract(const Duration(days: 6)),
-        updatedAt: now.subtract(const Duration(days: 6)),
-      ),
-    ];
-
-    for (final exp in sampleExpenses) {
-      await box.put(exp.id, exp.toMap());
-    }
-
-    // Default monthly budget & currency
+    // Fresh init database starts with 0 transactions and default settings
     final sBox = await settingsBox;
-    await sBox.put('monthly_budget', 1500.0);
-    await sBox.put('currency_code', 'INR');
-    await sBox.put('currency_symbol', '₹');
+    if (!sBox.containsKey('currency_code')) {
+      await sBox.put('monthly_budget', 0.0);
+      await sBox.put('currency_code', 'INR');
+      await sBox.put('currency_symbol', '₹');
+      await sBox.put('security_lock_enabled', false);
+      await sBox.put('onboarding_completed', false);
+    }
   }
 
   Future<void> addExpense(Expense expense) async {
@@ -163,7 +75,7 @@ class ExpenseHiveDatasource {
 
   Future<double> getMonthlyBudget() async {
     final sBox = await settingsBox;
-    return (sBox.get('monthly_budget', defaultValue: 1500.0) as num).toDouble();
+    return (sBox.get('monthly_budget', defaultValue: 0.0) as num).toDouble();
   }
 
   Future<void> setMonthlyBudget(double budget) async {
@@ -211,15 +123,36 @@ class ExpenseHiveDatasource {
     await sBox.put('currency_symbol', symbol);
   }
 
+  Future<String?> getUserName() async {
+    final sBox = await settingsBox;
+    return sBox.get('user_name') as String?;
+  }
+
+  Future<void> setUserName(String name) async {
+    final sBox = await settingsBox;
+    await sBox.put('user_name', name);
+  }
+
+  Future<bool> isOnboardingCompleted() async {
+    final sBox = await settingsBox;
+    return sBox.get('onboarding_completed', defaultValue: false) as bool;
+  }
+
+  Future<void> setOnboardingCompleted(bool completed) async {
+    final sBox = await settingsBox;
+    await sBox.put('onboarding_completed', completed);
+  }
+
   Future<void> resetDatabase() async {
     final b = await box;
     await b.clear();
 
     final sBox = await settingsBox;
     await sBox.clear();
-    await sBox.put('monthly_budget', 1500.0);
+    await sBox.put('monthly_budget', 0.0);
     await sBox.put('currency_code', 'INR');
     await sBox.put('currency_symbol', '₹');
     await sBox.put('security_lock_enabled', false);
+    await sBox.put('onboarding_completed', false);
   }
 }

@@ -58,7 +58,7 @@ class DashboardScreen extends StatelessWidget {
                 Text(
                   'Income & Expense Tracker',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11,
                     color: AppTheme.textColor,
                   ),
                 ),
@@ -128,44 +128,48 @@ class DashboardScreen extends StatelessWidget {
           }
 
           if (state is DashboardLoaded) {
-            return RefreshIndicator(
-              color: AppTheme.baseHighlightColor,
-              backgroundColor: AppTheme.cardBackgroundColor,
-              onRefresh: () => context
-                  .read<DashboardCubit>()
-                  .loadDashboard(filterType: state.filterType),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
+            return SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top Greeting Header
+                  // Greeting & Period Info
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
-                          children: [
-                            Text(
-                              'Hello, ',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.textColor,
-                              ),
-                            ),
-                            Text(
-                              'Happy User',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.baseHighlightColor,
-                              ),
-                            ),
-                            Text(
-                              '! 👋',
-                              style: TextStyle(fontSize: 24),
-                            ),
-                          ],
+                        FutureBuilder<String?>(
+                          future: repository.getUserName(),
+                          builder: (context, snapshot) {
+                            final username = (snapshot.data != null && snapshot.data!.trim().isNotEmpty)
+                                ? snapshot.data!.trim()
+                                : 'User';
+                            return Row(
+                              children: [
+                                const Text(
+                                  'Hello, ',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.textColor,
+                                  ),
+                                ),
+                                Text(
+                                  username,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.baseHighlightColor,
+                                  ),
+                                ),
+                                const Text(
+                                  '👋',
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                         const SizedBox(height: 4),
                         Text(
