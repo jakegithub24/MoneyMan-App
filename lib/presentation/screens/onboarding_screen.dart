@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/repositories/expense_repository.dart';
 import '../theme/app_theme.dart';
@@ -68,6 +69,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (name.isEmpty) {
       setState(() {
         _errorMessage = 'Please enter your name to continue.';
+      });
+      return;
+    }
+
+    if (name.contains(' ') || RegExp(r'\s').hasMatch(name)) {
+      setState(() {
+        _errorMessage = 'Username must be a single word (no spaces allowed).';
+      });
+      return;
+    }
+
+    if (name.length > 30) {
+      setState(() {
+        _errorMessage = 'Username cannot exceed 30 characters.';
       });
       return;
     }
@@ -287,10 +302,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Name Input Text Field
           TextField(
             controller: _nameController,
+            maxLength: 30,
+            inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
             textCapitalization: TextCapitalization.words,
             style: const TextStyle(color: AppTheme.textColor, fontSize: 16, fontWeight: FontWeight.bold),
             decoration: InputDecoration(
-              hintText: 'Enter your name (e.g. Alex)',
+              hintText: 'Enter single-word username (max 30 chars)',
               prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
               filled: true,
               fillColor: AppTheme.cardBackgroundColor,

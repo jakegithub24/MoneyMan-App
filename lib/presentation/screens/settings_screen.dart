@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/expense_repository.dart';
 import '../state/category/category_cubit.dart';
@@ -30,6 +31,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  String _currentUsername = 'User';
   double _currentBudget = 0.0;
   bool _isLockEnabled = false;
   String? _savedPin;
@@ -41,14 +43,104 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
+    final username = await widget.repository.getUserName();
     final budget = await widget.repository.getMonthlyBudget();
     final lockEnabled = await widget.repository.isSecurityLockEnabled();
     final pin = await widget.repository.getSecurityPin();
     setState(() {
+      _currentUsername = (username != null && username.trim().isNotEmpty) ? username.trim() : 'User';
       _currentBudget = budget;
       _isLockEnabled = lockEnabled;
       _savedPin = pin;
     });
+  }
+
+  Future<void> _updateUsernameDialog() async {
+    final controller = TextEditingController(text: _currentUsername);
+    String? errorText;
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: AppTheme.cardBackgroundColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Update Username', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Enter single-word username (max 30 characters):',
+                style: TextStyle(color: AppTheme.textColor, fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLength: 30,
+                inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+                textCapitalization: TextCapitalization.words,
+                style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
+                  hintText: 'e.g. Alex',
+                  errorText: errorText,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.baseHighlightColor,
+                foregroundColor: AppTheme.backgroundColor,
+              ),
+              onPressed: () {
+                final name = controller.text.trim();
+                if (name.isEmpty) {
+                  setDialogState(() {
+                    errorText = 'Name cannot be empty';
+                  });
+                  return;
+                }
+                if (name.contains(' ') || RegExp(r'\s').hasMatch(name)) {
+                  setDialogState(() {
+                    errorText = 'Username must be a single word (no spaces)';
+                  });
+                  return;
+                }
+                if (name.length > 30) {
+                  setDialogState(() {
+                    errorText = 'Name cannot exceed 30 characters';
+                  });
+                  return;
+                }
+                Navigator.pop(ctx, name);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      await widget.repository.setUserName(result);
+      await _loadSettings();
+      widget.onSettingsUpdated();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Username updated to "$result"', style: const TextStyle(color: AppTheme.textColor)),
+            backgroundColor: AppTheme.cardBackgroundColor,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _setBudgetDialog() async {
@@ -153,6 +245,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Profile Section
+          _buildSectionHeader('USER PROFILE'),
+          Card(
+            color: AppTheme.cardBackgroundColor,
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
+              ),
+              title: const Text(
+                'Update Username',
+                style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                'Current: $_currentUsername',
+                style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              onTap: _updateUsernameDialog,
+            ),
+          ),
+          const SizedBox(height: 24),
+
           // Preferences Section
           _buildSectionHeader('PREFERENCES'),
           BlocBuilder<CurrencyCubit, CurrencyState>(
