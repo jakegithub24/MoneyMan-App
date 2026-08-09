@@ -33,6 +33,7 @@ class ExpenseHiveDatasource {
       await sBox.put('currency_code', 'INR');
       await sBox.put('currency_symbol', '₹');
       await sBox.put('security_lock_enabled', false);
+      await sBox.put('auto_lock_interval_minutes', 1);
       await sBox.put('onboarding_completed', false);
     }
   }
@@ -107,6 +108,26 @@ class ExpenseHiveDatasource {
     await sBox.put('security_lock_enabled', enabled);
   }
 
+  Future<int> getAutoLockIntervalMinutes() async {
+    final sBox = await settingsBox;
+    return sBox.get('auto_lock_interval_minutes', defaultValue: 1) as int;
+  }
+
+  Future<void> setAutoLockIntervalMinutes(int minutes) async {
+    final sBox = await settingsBox;
+    await sBox.put('auto_lock_interval_minutes', minutes);
+  }
+
+  Future<int?> getLastActiveTimestamp() async {
+    final sBox = await settingsBox;
+    return sBox.get('last_active_timestamp') as int?;
+  }
+
+  Future<void> setLastActiveTimestamp(int timestamp) async {
+    final sBox = await settingsBox;
+    await sBox.put('last_active_timestamp', timestamp);
+  }
+
   Future<String> getCurrencyCode() async {
     final sBox = await settingsBox;
     return sBox.get('currency_code', defaultValue: 'INR') as String;
@@ -153,6 +174,8 @@ class ExpenseHiveDatasource {
     await sBox.put('currency_code', 'INR');
     await sBox.put('currency_symbol', '₹');
     await sBox.put('security_lock_enabled', false);
+    await sBox.put('auto_lock_interval_minutes', 1);
+    await sBox.delete('last_active_timestamp');
     await sBox.put('onboarding_completed', false);
   }
 }

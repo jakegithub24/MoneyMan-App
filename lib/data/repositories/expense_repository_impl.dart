@@ -94,6 +94,18 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<void> setSecurityLockEnabled(bool enabled) => datasource.setSecurityLockEnabled(enabled);
 
   @override
+  Future<int> getAutoLockIntervalMinutes() => datasource.getAutoLockIntervalMinutes();
+
+  @override
+  Future<void> setAutoLockIntervalMinutes(int minutes) => datasource.setAutoLockIntervalMinutes(minutes);
+
+  @override
+  Future<int?> getLastActiveTimestamp() => datasource.getLastActiveTimestamp();
+
+  @override
+  Future<void> setLastActiveTimestamp(int timestamp) => datasource.setLastActiveTimestamp(timestamp);
+
+  @override
   Future<String> getCurrencyCode() => datasource.getCurrencyCode();
 
   @override

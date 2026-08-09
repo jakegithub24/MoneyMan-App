@@ -35,6 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   double _currentBudget = 0.0;
   bool _isLockEnabled = false;
   String? _savedPin;
+  int _autoLockIntervalMinutes = 1;
 
   @override
   void initState() {
@@ -47,12 +48,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final budget = await widget.repository.getMonthlyBudget();
     final lockEnabled = await widget.repository.isSecurityLockEnabled();
     final pin = await widget.repository.getSecurityPin();
+    final autoLockInterval = await widget.repository.getAutoLockIntervalMinutes();
     setState(() {
       _currentUsername = (username != null && username.trim().isNotEmpty) ? username.trim() : 'User';
       _currentBudget = budget;
       _isLockEnabled = lockEnabled;
       _savedPin = pin;
+      _autoLockIntervalMinutes = autoLockInterval;
     });
+  }
+
+  String _getAutoLockIntervalLabel(int minutes) {
+    switch (minutes) {
+      case 1:
+        return '1 minute';
+      case 5:
+        return '5 minutes';
+      case 10:
+        return '10 minutes';
+      case 30:
+        return '30 minutes';
+      case 60:
+        return '1 hour';
+      default:
+        return '$minutes minutes';
+    }
+  }
+
+  Future<void> _showAutoLockIntervalDialog() async {
+    final intervals = [
+      {'label': '1 minute', 'value': 1},
+      {'label': '5 minutes', 'value': 5},
+      {'label': '10 minutes', 'value': 10},
+      {'label': '30 minutes', 'value': 30},
+      {'label': '1 hour', 'value': 60},
+    ];
+
+    final selected = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Auto-Lock Interval', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: intervals.map((item) {
+            final value = item['value'] as int;
+            final label = item['label'] as String;
+            final isSelected = value == _autoLockIntervalMinutes;
+            return ListTile(
+              title: Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppTheme.baseHighlightColor : AppTheme.textColor,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected ? const Icon(Icons.check_rounded, color: AppTheme.baseHighlightColor) : null,
+              onTap: () => Navigator.pop(ctx, value),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+
+    if (selected != null) {
+      await widget.repository.setAutoLockIntervalMinutes(selected);
+      await _loadSettings();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Auto-lock interval set to ${_getAutoLockIntervalLabel(selected)}', style: const TextStyle(color: AppTheme.textColor)),
+            backgroundColor: AppTheme.cardBackgroundColor,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _updateUsernameDialog() async {
@@ -223,6 +294,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await widget.repository.setSecurityLockEnabled(true);
         await _loadSettings();
         widget.onSettingsUpdated();
+        if (mounted) {
+          await _showAutoLockIntervalDialog();
+        }
       }
     } else {
       await widget.repository.setSecurityLockEnabled(false);
@@ -432,6 +506,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }
                       }
                     },
+                  ),
+                  const Divider(color: AppTheme.backgroundColor, height: 1),
+                  ListTile(
+                    leading: const SizedBox(width: 40),
+                    title: const Text(
+                      'Auto-Lock Interval',
+                      style: TextStyle(color: AppTheme.textColor, fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      'Lock after inactivity: ${_getAutoLockIntervalLabel(_autoLockIntervalMinutes)}',
+                      style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                    onTap: _showAutoLockIntervalDialog,
                   ),
                 ],
               ],

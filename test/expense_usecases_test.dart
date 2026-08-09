@@ -91,6 +91,21 @@ class InMemoryExpenseRepository implements ExpenseRepository {
   @override
   Future<void> setSecurityLockEnabled(bool enabled) async => _lockEnabled = enabled;
 
+  int _autoLockIntervalMinutes = 1;
+  int? _lastActiveTimestamp;
+
+  @override
+  Future<int> getAutoLockIntervalMinutes() async => _autoLockIntervalMinutes;
+
+  @override
+  Future<void> setAutoLockIntervalMinutes(int minutes) async => _autoLockIntervalMinutes = minutes;
+
+  @override
+  Future<int?> getLastActiveTimestamp() async => _lastActiveTimestamp;
+
+  @override
+  Future<void> setLastActiveTimestamp(int timestamp) async => _lastActiveTimestamp = timestamp;
+
   String _currencyCode = 'INR';
   String _currencySymbol = '₹';
 
@@ -210,6 +225,8 @@ class InMemoryExpenseRepository implements ExpenseRepository {
     _currencySymbol = '₹';
     _securityPin = null;
     _lockEnabled = false;
+    _autoLockIntervalMinutes = 1;
+    _lastActiveTimestamp = null;
     _userName = null;
     _onboardingCompleted = false;
   }

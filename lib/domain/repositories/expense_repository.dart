@@ -31,6 +31,10 @@ abstract class ExpenseRepository {
   Future<void> setSecurityPin(String? pin);
   Future<bool> isSecurityLockEnabled();
   Future<void> setSecurityLockEnabled(bool enabled);
+  Future<int> getAutoLockIntervalMinutes();
+  Future<void> setAutoLockIntervalMinutes(int minutes);
+  Future<int?> getLastActiveTimestamp();
+  Future<void> setLastActiveTimestamp(int timestamp);
 
   // Currency Management
   Future<String> getCurrencyCode();

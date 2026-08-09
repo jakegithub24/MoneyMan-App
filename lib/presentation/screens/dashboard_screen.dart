@@ -11,6 +11,7 @@ import '../widgets/expense_tile.dart';
 import '../widgets/filter_chip_bar.dart';
 import '../widgets/summary_card.dart';
 import 'expense_form_screen.dart';
+import 'security_pin_screen.dart';
 import 'settings_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -69,6 +70,33 @@ class DashboardScreen extends StatelessWidget {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.lock_outline_rounded, color: AppTheme.textColor),
+            tooltip: 'Lock App',
+            onPressed: () async {
+              final pin = await repository.getSecurityPin();
+              final lockEnabled = await repository.isSecurityLockEnabled();
+              if (!context.mounted) return;
+              if (lockEnabled && pin != null && pin.isNotEmpty) {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SecurityPinScreen(
+                      mode: PinMode.unlock,
+                      savedPin: pin,
+                    ),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('App lock is disabled. Enable PIN lock in Settings.', style: TextStyle(color: AppTheme.textColor)),
+                    backgroundColor: AppTheme.cardBackgroundColor,
+                  ),
+                );
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings_rounded, color: AppTheme.textColor),
             tooltip: 'Settings & Tools',

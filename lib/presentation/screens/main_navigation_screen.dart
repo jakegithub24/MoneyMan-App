@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/expense_repository.dart';
@@ -22,14 +23,112 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
+class _MainNavigationScreenState extends State<MainNavigationScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
   bool _isUnlocked = false;
+  DateTime? _lastPausedTime;
+  DateTime _lastUserActivityTime = DateTime.now();
+  Timer? _inactivityTimer;
+  bool _isLockDialogOpen = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkAppLock();
+    _startInactivityChecker();
+  }
+
+  @override
+  void dispose() {
+    _inactivityTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void _onUserActivity() {
+    _lastUserActivityTime = DateTime.now();
+  }
+
+  void _startInactivityChecker() {
+    _inactivityTimer?.cancel();
+    _inactivityTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      _checkInactivityAutoLock();
+    });
+  }
+
+  Future<void> _checkInactivityAutoLock() async {
+    if (!_isUnlocked || _isLockDialogOpen) return;
+
+    final lockEnabled = await widget.repository.isSecurityLockEnabled();
+    final pin = await widget.repository.getSecurityPin();
+    if (!lockEnabled || pin == null || pin.isEmpty) return;
+
+    final intervalMinutes = await widget.repository.getAutoLockIntervalMinutes();
+    final elapsed = DateTime.now().difference(_lastUserActivityTime);
+
+    if (elapsed >= Duration(minutes: intervalMinutes)) {
+      _isLockDialogOpen = true;
+      if (!mounted) return;
+      final success = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SecurityPinScreen(
+            mode: PinMode.unlock,
+            savedPin: pin,
+          ),
+        ),
+      );
+      _isLockDialogOpen = false;
+      if (success == true) {
+        _lastUserActivityTime = DateTime.now();
+      } else {
+        _checkInactivityAutoLock();
+      }
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      _lastPausedTime = DateTime.now();
+      widget.repository.setLastActiveTimestamp(_lastPausedTime!.millisecondsSinceEpoch);
+    } else if (state == AppLifecycleState.resumed) {
+      _checkAutoLockOnResume();
+    }
+  }
+
+  Future<void> _checkAutoLockOnResume() async {
+    final lockEnabled = await widget.repository.isSecurityLockEnabled();
+    final pin = await widget.repository.getSecurityPin();
+    if (!lockEnabled || pin == null || pin.isEmpty) return;
+
+    final intervalMinutes = await widget.repository.getAutoLockIntervalMinutes();
+    final lastTimestamp = await widget.repository.getLastActiveTimestamp();
+
+    final lastTime = _lastPausedTime ?? (lastTimestamp != null ? DateTime.fromMillisecondsSinceEpoch(lastTimestamp) : null);
+    if (lastTime != null) {
+      final elapsed = DateTime.now().difference(lastTime);
+      if (elapsed >= Duration(minutes: intervalMinutes)) {
+        if (!mounted || _isLockDialogOpen) return;
+        _isLockDialogOpen = true;
+        final success = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SecurityPinScreen(
+              mode: PinMode.unlock,
+              savedPin: pin,
+            ),
+          ),
+        );
+        _isLockDialogOpen = false;
+        if (success == true) {
+          _lastUserActivityTime = DateTime.now();
+        } else {
+          _checkAutoLockOnResume();
+        }
+      }
+    }
   }
 
   Future<void> _checkAppLock() async {
@@ -54,6 +153,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     if (lockEnabled && pin != null && pin.isNotEmpty) {
       if (!mounted) return;
+      _isLockDialogOpen = true;
       final success = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
@@ -63,11 +163,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ),
       );
+      _isLockDialogOpen = false;
 
       if (success == true) {
         if (mounted) {
           setState(() {
             _isUnlocked = true;
+            _lastUserActivityTime = DateTime.now();
           });
         }
       } else {
@@ -77,6 +179,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       if (mounted) {
         setState(() {
           _isUnlocked = true;
+          _lastUserActivityTime = DateTime.now();
         });
       }
     }
@@ -112,65 +215,74 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const ExpenseListScreen(),
     ];
 
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.cardBackgroundColor,
-          border: Border(
-            top: BorderSide(
-              color: AppTheme.textColor.withValues(alpha: 0.2),
-              width: 1,
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _onUserActivity(),
+      onPointerMove: (_) => _onUserActivity(),
+      onPointerUp: (_) => _onUserActivity(),
+      child: Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
+        body: IndexedStack(
+          index: _currentIndex,
+          children: screens,
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: AppTheme.cardBackgroundColor,
+            border: Border(
+              top: BorderSide(
+                color: AppTheme.textColor.withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
           ),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            backgroundColor: AppTheme.cardBackgroundColor,
+            selectedItemColor: AppTheme.baseHighlightColor,
+            unselectedItemColor: AppTheme.textColor.withValues(alpha: 0.6),
+            elevation: 0,
+            onTap: (index) {
+              _onUserActivity();
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard_rounded),
+                label: 'Dashboard',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.receipt_long_rounded),
+                label: 'Transactions',
+              ),
+            ],
+          ),
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          backgroundColor: AppTheme.cardBackgroundColor,
-          selectedItemColor: AppTheme.baseHighlightColor,
-          unselectedItemColor: AppTheme.textColor.withValues(alpha: 0.6),
-          elevation: 0,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_rounded),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_rounded),
-              label: 'Transactions',
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppTheme.baseHighlightColor,
-        foregroundColor: AppTheme.backgroundColor,
-        onPressed: () async {
-          final dashboardCubit = context.read<DashboardCubit>();
-          final listCubit = context.read<ExpenseListCubit>();
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppTheme.baseHighlightColor,
+          foregroundColor: AppTheme.backgroundColor,
+          onPressed: () async {
+            _onUserActivity();
+            final dashboardCubit = context.read<DashboardCubit>();
+            final listCubit = context.read<ExpenseListCubit>();
 
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const ExpenseFormScreen(),
-            ),
-          );
-          if (result == true) {
-            dashboardCubit.loadDashboard();
-            listCubit.loadExpenses();
-          }
-        },
-        child: const Icon(Icons.add_rounded, size: 28, color: AppTheme.backgroundColor),
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ExpenseFormScreen(),
+              ),
+            );
+            _onUserActivity();
+            if (result == true) {
+              dashboardCubit.loadDashboard();
+              listCubit.loadExpenses();
+            }
+          },
+          child: const Icon(Icons.add_rounded, size: 28, color: AppTheme.backgroundColor),
+        ),
       ),
     );
   }
