@@ -222,9 +222,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
       onPointerUp: (_) => _onUserActivity(),
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        body: IndexedStack(
-          index: _currentIndex,
-          children: screens,
+        body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          switchInCurve: Curves.easeInOut,
+          switchOutCurve: Curves.easeInOut,
+          child: KeyedSubtree(
+            key: ValueKey<int>(_currentIndex),
+            child: screens[_currentIndex],
+          ),
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(

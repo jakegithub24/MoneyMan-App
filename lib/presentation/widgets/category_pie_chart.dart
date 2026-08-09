@@ -190,6 +190,8 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
           );
         }),
       ),
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOutCubic,
     );
   }
 
