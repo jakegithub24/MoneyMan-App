@@ -35,15 +35,20 @@ class DashboardScreen extends StatelessWidget {
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
+                color: AppTheme.cardBackgroundColor,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppTheme.baseHighlightColor, width: 1.5),
               ),
-              child: const Icon(
-                Icons.account_balance_wallet_rounded,
-                color: AppTheme.baseHighlightColor,
-                size: 24,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'Logo/MoneyMan-Logo.jpg',
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             const SizedBox(width: 12),

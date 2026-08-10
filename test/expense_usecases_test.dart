@@ -394,15 +394,24 @@ void main() {
         createdAt: now,
         updatedAt: now,
       ));
+      await repository.setUserName('Alex');
+      await repository.setCurrency('USD', '\$');
+      await repository.setMonthlyBudget(5000);
       await repository.setSecurityPin('9999');
       await repository.setSecurityLockEnabled(true);
+      await repository.setOnboardingCompleted(true);
 
       await repository.resetDatabase();
 
       final list = await repository.listExpenses();
       expect(list, isEmpty);
+      expect(await repository.getUserName(), isNull);
+      expect(await repository.getMonthlyBudget(), equals(0.0));
+      expect(await repository.getCurrencyCode(), equals('INR'));
+      expect(await repository.getCurrencySymbol(), equals('₹'));
       expect(await repository.isSecurityLockEnabled(), isFalse);
       expect(await repository.getSecurityPin(), isNull);
+      expect(await repository.isOnboardingCompleted(), isFalse);
     });
 
     test('User onboarding and username setting workflow', () async {
@@ -415,9 +424,10 @@ void main() {
       expect(await repository.isOnboardingCompleted(), isTrue);
       expect(await repository.getUserName(), equals('Alex'));
 
-      // Database reset clears onboarding state
+      // Database reset clears onboarding state & username
       await repository.resetDatabase();
       expect(await repository.isOnboardingCompleted(), isFalse);
+      expect(await repository.getUserName(), isNull);
     });
   });
 }

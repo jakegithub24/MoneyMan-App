@@ -74,7 +74,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _showAutoLockIntervalDialog() async {
+  Future<void> _showAutoLockIntervalDialog({bool requirePinCheck = true}) async {
+    if (requirePinCheck) {
+      final lockEnabled = await widget.repository.isSecurityLockEnabled();
+      final currentPin = await widget.repository.getSecurityPin();
+      if (!mounted) return;
+      if (lockEnabled && currentPin != null && currentPin.isNotEmpty) {
+        final unlocked = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SecurityPinScreen(
+              mode: PinMode.unlock,
+              savedPin: currentPin,
+            ),
+          ),
+        );
+        if (unlocked != true) return;
+      }
+    }
+
+    if (!mounted) return;
     final intervals = [
       {'label': '1 minute', 'value': 1},
       {'label': '5 minutes', 'value': 5},
@@ -300,10 +319,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await _loadSettings();
         widget.onSettingsUpdated();
         if (mounted) {
-          await _showAutoLockIntervalDialog();
+          await _showAutoLockIntervalDialog(requirePinCheck: false);
         }
       }
     } else {
+      final currentPin = await widget.repository.getSecurityPin();
+      if (currentPin != null && currentPin.isNotEmpty) {
+        if (!mounted) return;
+        final unlocked = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SecurityPinScreen(
+              mode: PinMode.unlock,
+              savedPin: currentPin,
+            ),
+          ),
+        );
+        if (unlocked != true) return;
+      }
+
       await widget.repository.setSecurityLockEnabled(false);
       await _loadSettings();
       widget.onSettingsUpdated();
@@ -454,7 +488,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
                     onTap: () async {
-                      final messenger = ScaffoldMessenger.of(context);
+                      final currentPin = await widget.repository.getSecurityPin();
+                      if (!context.mounted) return;
+                      if (currentPin != null && currentPin.isNotEmpty) {
+                        final unlocked = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SecurityPinScreen(
+                              mode: PinMode.unlock,
+                              savedPin: currentPin,
+                            ),
+                          ),
+                        );
+                        if (unlocked != true) return;
+                      }
+
+                      if (!context.mounted) return;
                       final newPin = await Navigator.push<String>(
                         context,
                         MaterialPageRoute(
@@ -464,8 +513,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       if (newPin != null && newPin.isNotEmpty) {
                         await widget.repository.setSecurityPin(newPin);
                         await _loadSettings();
-                        if (mounted) {
-                          messenger.showSnackBar(
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('PIN updated successfully', style: TextStyle(color: AppTheme.textColor)),
                               backgroundColor: AppTheme.cardBackgroundColor,
@@ -576,6 +625,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
               onTap: () async {
+                final lockEnabled = await widget.repository.isSecurityLockEnabled();
+                final pin = await widget.repository.getSecurityPin();
+                if (!context.mounted) return;
+
+                if (lockEnabled && pin != null && pin.isNotEmpty) {
+                  final unlocked = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SecurityPinScreen(
+                        mode: PinMode.unlock,
+                        savedPin: pin,
+                      ),
+                    ),
+                  );
+                  if (unlocked != true) return;
+                }
+
+                if (!context.mounted) return;
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(

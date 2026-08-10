@@ -213,16 +213,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           // App Logo / Icon Header
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: AppTheme.baseHighlightColor.withValues(alpha: 0.15),
+              color: AppTheme.cardBackgroundColor,
               shape: BoxShape.circle,
               border: Border.all(color: AppTheme.baseHighlightColor, width: 2),
             ),
-            child: const Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppTheme.baseHighlightColor,
-              size: 64,
+            child: ClipOval(
+              child: Image.asset(
+                'Logo/MoneyMan-Logo-large.jpg',
+                width: 90,
+                height: 90,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -330,15 +333,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: AppTheme.baseHighlightColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppTheme.cardBackgroundColor,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: AppTheme.baseHighlightColor, width: 2),
                     ),
-                    child: const Icon(
-                      Icons.person_pin_rounded,
-                      color: AppTheme.baseHighlightColor,
-                      size: 40,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.asset(
+                        'Logo/MoneyMan-Logo.jpg',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),

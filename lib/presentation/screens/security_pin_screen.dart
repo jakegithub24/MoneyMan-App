@@ -110,10 +110,21 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.lock_rounded,
-                size: 56,
-                color: AppTheme.baseHighlightColor,
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppTheme.cardBackgroundColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppTheme.baseHighlightColor, width: 2),
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'Logo/MoneyMan-Logo.jpg',
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               Text(
