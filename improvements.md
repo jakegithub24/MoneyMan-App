@@ -6,3 +6,4 @@
 1. Fingerprint implementation (biometric along with 4 digit security pin)
 2. Multi-lingual
 3. Currency digit notation (Ex, Rs.24,06,45,520.46, $123,445,225.66, etc)
+4. Haptic feedback

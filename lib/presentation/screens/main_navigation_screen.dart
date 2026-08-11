@@ -68,6 +68,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     final elapsed = DateTime.now().difference(ActivityTracker.lastUserActivityTime);
 
     if (elapsed >= Duration(minutes: intervalMinutes)) {
+      final biometricEnabled = await widget.repository.isBiometricLockEnabled();
       _isLockDialogOpen = true;
       if (!mounted) return;
       final success = await Navigator.push<bool>(
@@ -76,6 +77,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
           builder: (_) => SecurityPinScreen(
             mode: PinMode.unlock,
             savedPin: pin,
+            isBiometricEnabled: biometricEnabled,
           ),
         ),
       );
@@ -110,6 +112,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     if (lastTime != null) {
       final elapsed = DateTime.now().difference(lastTime);
       if (elapsed >= Duration(minutes: intervalMinutes)) {
+        final biometricEnabled = await widget.repository.isBiometricLockEnabled();
         if (!mounted || _isLockDialogOpen) return;
         _isLockDialogOpen = true;
         final success = await Navigator.push<bool>(
@@ -118,6 +121,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
             builder: (_) => SecurityPinScreen(
               mode: PinMode.unlock,
               savedPin: pin,
+              isBiometricEnabled: biometricEnabled,
             ),
           ),
         );
@@ -156,6 +160,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     final pin = await widget.repository.getSecurityPin();
 
     if (lockEnabled && pin != null && pin.isNotEmpty) {
+      final biometricEnabled = await widget.repository.isBiometricLockEnabled();
       if (!mounted) return;
       _isLockDialogOpen = true;
       final success = await Navigator.push<bool>(
@@ -164,6 +169,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
           builder: (_) => SecurityPinScreen(
             mode: PinMode.unlock,
             savedPin: pin,
+            isBiometricEnabled: biometricEnabled,
           ),
         ),
       );

@@ -108,6 +108,16 @@ class ExpenseHiveDatasource {
     await sBox.put('security_lock_enabled', enabled);
   }
 
+  Future<bool> isBiometricLockEnabled() async {
+    final sBox = await settingsBox;
+    return sBox.get('biometric_lock_enabled', defaultValue: true) as bool;
+  }
+
+  Future<void> setBiometricLockEnabled(bool enabled) async {
+    final sBox = await settingsBox;
+    await sBox.put('biometric_lock_enabled', enabled);
+  }
+
   Future<int> getAutoLockIntervalMinutes() async {
     final sBox = await settingsBox;
     return sBox.get('auto_lock_interval_minutes', defaultValue: 1) as int;
@@ -186,6 +196,7 @@ class ExpenseHiveDatasource {
     await sBox.put('currency_code', 'INR');
     await sBox.put('currency_symbol', '₹');
     await sBox.put('security_lock_enabled', false);
+    await sBox.put('biometric_lock_enabled', true);
     await sBox.put('auto_lock_interval_minutes', 1);
     await sBox.delete('last_active_timestamp');
     await sBox.put('onboarding_completed', false);

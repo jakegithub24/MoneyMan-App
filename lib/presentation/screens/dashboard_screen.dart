@@ -83,12 +83,15 @@ class DashboardScreen extends StatelessWidget {
               final lockEnabled = await repository.isSecurityLockEnabled();
               if (!context.mounted) return;
               if (lockEnabled && pin != null && pin.isNotEmpty) {
+                final biometricEnabled = await repository.isBiometricLockEnabled();
+                if (!context.mounted) return;
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => SecurityPinScreen(
                       mode: PinMode.unlock,
                       savedPin: pin,
+                      isBiometricEnabled: biometricEnabled,
                     ),
                   ),
                 );

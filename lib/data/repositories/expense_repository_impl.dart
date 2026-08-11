@@ -94,6 +94,12 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<void> setSecurityLockEnabled(bool enabled) => datasource.setSecurityLockEnabled(enabled);
 
   @override
+  Future<bool> isBiometricLockEnabled() => datasource.isBiometricLockEnabled();
+
+  @override
+  Future<void> setBiometricLockEnabled(bool enabled) => datasource.setBiometricLockEnabled(enabled);
+
+  @override
   Future<int> getAutoLockIntervalMinutes() => datasource.getAutoLockIntervalMinutes();
 
   @override

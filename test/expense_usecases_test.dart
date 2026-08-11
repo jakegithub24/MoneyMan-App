@@ -89,11 +89,19 @@ class InMemoryExpenseRepository implements ExpenseRepository {
   @override
   Future<void> setSecurityPin(String? pin) async => _securityPin = pin;
 
+  bool _biometricLockEnabled = true;
+
   @override
   Future<bool> isSecurityLockEnabled() async => _lockEnabled;
 
   @override
   Future<void> setSecurityLockEnabled(bool enabled) async => _lockEnabled = enabled;
+
+  @override
+  Future<bool> isBiometricLockEnabled() async => _biometricLockEnabled;
+
+  @override
+  Future<void> setBiometricLockEnabled(bool enabled) async => _biometricLockEnabled = enabled;
 
   int _autoLockIntervalMinutes = 1;
   int? _lastActiveTimestamp;

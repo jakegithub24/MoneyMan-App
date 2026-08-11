@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import '../theme/app_theme.dart';
 
 enum PinMode { setup, confirm, unlock }
@@ -6,11 +7,13 @@ enum PinMode { setup, confirm, unlock }
 class SecurityPinScreen extends StatefulWidget {
   final PinMode mode;
   final String? savedPin;
+  final bool isBiometricEnabled;
 
   const SecurityPinScreen({
     super.key,
     required this.mode,
     this.savedPin,
+    this.isBiometricEnabled = true,
   });
 
   @override
@@ -23,10 +26,87 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
   late PinMode _currentMode;
   String _errorMessage = '';
 
+  final LocalAuthentication _auth = LocalAuthentication();
+  bool _hasFingerprintSensor = false;
+  bool _isAuthenticating = false;
+
   @override
   void initState() {
     super.initState();
     _currentMode = widget.mode;
+    if (_currentMode == PinMode.unlock) {
+      _checkBiometricsAndAuthenticate();
+    }
+  }
+
+  Future<void> _checkBiometricsAndAuthenticate() async {
+    if (!widget.isBiometricEnabled) {
+      if (mounted) {
+        setState(() {
+          _hasFingerprintSensor = false;
+        });
+      }
+      return;
+    }
+    try {
+      final bool canCheck = await _auth.canCheckBiometrics;
+      final bool isDeviceSupported = await _auth.isDeviceSupported();
+      final List<BiometricType> availableBiometrics = await _auth.getAvailableBiometrics();
+
+      final bool hasSensor = canCheck && isDeviceSupported && (
+        availableBiometrics.contains(BiometricType.fingerprint) ||
+        availableBiometrics.contains(BiometricType.strong) ||
+        availableBiometrics.contains(BiometricType.weak) ||
+        availableBiometrics.isNotEmpty
+      );
+
+      if (mounted) {
+        setState(() {
+          _hasFingerprintSensor = hasSensor;
+        });
+      }
+
+      if (hasSensor) {
+        await _authenticateWithFingerprint();
+      }
+    } catch (_) {
+      // Biometrics not present on device or mock runner
+    }
+  }
+
+  Future<void> _authenticateWithFingerprint() async {
+    if (_isAuthenticating) return;
+    if (mounted) {
+      setState(() {
+        _isAuthenticating = true;
+      });
+    }
+
+    try {
+      final bool authenticated = await _auth.authenticate(
+        localizedReason: 'Scan fingerprint to unlock MoneyMan',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+
+      if (authenticated && mounted) {
+        Navigator.pop(context, true);
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Fingerprint verification failed. Use PIN.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+      }
+    }
   }
 
   void _onKeyPress(String digit) {
@@ -187,13 +267,40 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
                       ['1', '2', '3'],
                       ['4', '5', '6'],
                       ['7', '8', '9'],
-                      ['', '0', 'delete']
+                      ['biometric', '0', 'delete']
                     ])
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: row.map((key) {
+                            if (key == 'biometric') {
+                              if (!_hasFingerprintSensor || _currentMode != PinMode.unlock) {
+                                return const SizedBox(width: 72, height: 72);
+                              }
+                              return InkWell(
+                                onTap: _authenticateWithFingerprint,
+                                borderRadius: BorderRadius.circular(36),
+                                child: Container(
+                                  width: 72,
+                                  height: 72,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.incomeColor.withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppTheme.incomeColor,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.fingerprint_rounded,
+                                    color: AppTheme.incomeColor,
+                                    size: 36,
+                                  ),
+                                ),
+                              );
+                            }
                             if (key.isEmpty) {
                               return const SizedBox(width: 72, height: 72);
                             }
