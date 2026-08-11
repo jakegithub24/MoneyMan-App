@@ -70,7 +70,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           builder: (_) => SecurityPinScreen(
             mode: PinMode.unlock,
             savedPin: currentPin,
-            isBiometricEnabled: _isBiometricEnabled,
+            isBiometricEnabled: false,
           ),
         ),
       );
@@ -156,7 +156,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
             builder: (_) => SecurityPinScreen(
               mode: PinMode.unlock,
               savedPin: currentPin,
-              isBiometricEnabled: _isBiometricEnabled,
+              isBiometricEnabled: false,
             ),
           ),
         );
@@ -179,7 +179,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           builder: (_) => SecurityPinScreen(
             mode: PinMode.unlock,
             savedPin: currentPin,
-            isBiometricEnabled: _isBiometricEnabled,
+            isBiometricEnabled: false,
           ),
         ),
       );
@@ -289,7 +289,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                             builder: (_) => SecurityPinScreen(
                               mode: PinMode.unlock,
                               savedPin: currentPin,
-                              isBiometricEnabled: _isBiometricEnabled,
+                              isBiometricEnabled: false,
                             ),
                           ),
                         );
