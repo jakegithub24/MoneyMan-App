@@ -18,6 +18,7 @@ import 'presentation/state/dashboard/dashboard_cubit.dart';
 import 'presentation/state/expense_form/expense_form_cubit.dart';
 import 'presentation/state/expense_list/expense_list_cubit.dart';
 import 'presentation/theme/app_theme.dart';
+import 'presentation/utils/activity_tracker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,6 +103,16 @@ class ExpenseTrackerApp extends StatelessWidget {
         title: 'MoneyMan',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
+        builder: (context, child) {
+          return Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) => ActivityTracker.recordActivity(),
+            onPointerMove: (_) => ActivityTracker.recordActivity(),
+            onPointerUp: (_) => ActivityTracker.recordActivity(),
+            onPointerHover: (_) => ActivityTracker.recordActivity(),
+            child: child!,
+          );
+        },
         home: MainNavigationScreen(
           repository: repository,
         ),

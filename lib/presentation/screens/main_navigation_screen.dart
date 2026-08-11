@@ -10,6 +10,7 @@ import 'expense_form_screen.dart';
 import 'expense_list_screen.dart';
 import 'onboarding_screen.dart';
 import 'security_pin_screen.dart';
+import '../utils/activity_tracker.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final ExpenseRepository repository;
@@ -27,7 +28,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
   int _currentIndex = 0;
   bool _isUnlocked = false;
   DateTime? _lastPausedTime;
-  DateTime _lastUserActivityTime = DateTime.now();
   Timer? _inactivityTimer;
   bool _isLockDialogOpen = false;
 
@@ -47,7 +47,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
   }
 
   void _onUserActivity() {
-    _lastUserActivityTime = DateTime.now();
+    ActivityTracker.recordActivity();
   }
 
   void _startInactivityChecker() {
@@ -65,7 +65,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     if (!lockEnabled || pin == null || pin.isEmpty) return;
 
     final intervalMinutes = await widget.repository.getAutoLockIntervalMinutes();
-    final elapsed = DateTime.now().difference(_lastUserActivityTime);
+    final elapsed = DateTime.now().difference(ActivityTracker.lastUserActivityTime);
 
     if (elapsed >= Duration(minutes: intervalMinutes)) {
       _isLockDialogOpen = true;
@@ -81,7 +81,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
       );
       _isLockDialogOpen = false;
       if (success == true) {
-        _lastUserActivityTime = DateTime.now();
+        ActivityTracker.recordActivity();
       } else {
         _checkInactivityAutoLock();
       }
@@ -123,7 +123,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
         );
         _isLockDialogOpen = false;
         if (success == true) {
-          _lastUserActivityTime = DateTime.now();
+          ActivityTracker.recordActivity();
         } else {
           _checkAutoLockOnResume();
         }
@@ -173,8 +173,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
         if (mounted) {
           setState(() {
             _isUnlocked = true;
-            _lastUserActivityTime = DateTime.now();
           });
+          ActivityTracker.recordActivity();
         }
       } else {
         _checkAppLock();
@@ -183,8 +183,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
       if (mounted) {
         setState(() {
           _isUnlocked = true;
-          _lastUserActivityTime = DateTime.now();
         });
+        ActivityTracker.recordActivity();
       }
     }
   }
