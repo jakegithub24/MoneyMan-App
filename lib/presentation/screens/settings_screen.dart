@@ -555,7 +555,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: AppTheme.popHighlightColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.file_download_rounded, color: AppTheme.popHighlightColor),
+                child: const Icon(Icons.file_upload_rounded, color: AppTheme.popHighlightColor),
               ),
               title: const Text(
                 'Export CSV Data',
@@ -584,7 +584,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.file_upload_rounded, color: AppTheme.baseHighlightColor),
+                child: const Icon(Icons.file_download_rounded, color: AppTheme.baseHighlightColor),
               ),
               title: const Text(
                 'Import CSV Data',

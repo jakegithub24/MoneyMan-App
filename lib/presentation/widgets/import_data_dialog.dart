@@ -159,7 +159,7 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.file_upload_rounded, color: AppTheme.baseHighlightColor, size: 28),
+                    Icon(Icons.file_download_rounded, color: AppTheme.baseHighlightColor, size: 28),
                     SizedBox(width: 10),
                     Text(
                       'Import CSV Data',
