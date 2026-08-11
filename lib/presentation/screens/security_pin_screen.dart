@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 
 enum PinMode { setup, confirm, unlock }
 
@@ -110,6 +111,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
   }
 
   void _onKeyPress(String digit) {
+    AppHaptics.selectionClick();
     if (_enteredPin.length < 4) {
       setState(() {
         _enteredPin += digit;
@@ -123,6 +125,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
   }
 
   void _onDelete() {
+    AppHaptics.lightImpact();
     if (_enteredPin.isNotEmpty) {
       setState(() {
         _enteredPin = _enteredPin.substring(0, _enteredPin.length - 1);
@@ -143,8 +146,10 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
 
       case PinMode.confirm:
         if (_enteredPin == _firstEnteredPin) {
+          AppHaptics.mediumImpact();
           Navigator.pop(context, _enteredPin);
         } else {
+          AppHaptics.heavyImpact();
           setState(() {
             _enteredPin = '';
             _firstEnteredPin = '';
@@ -156,8 +161,10 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
 
       case PinMode.unlock:
         if (_enteredPin == widget.savedPin) {
+          AppHaptics.mediumImpact();
           Navigator.pop(context, true);
         } else {
+          AppHaptics.heavyImpact();
           setState(() {
             _enteredPin = '';
             _errorMessage = 'Incorrect Security PIN';

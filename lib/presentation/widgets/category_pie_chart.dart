@@ -6,6 +6,7 @@ import '../state/category/category_cubit.dart';
 import '../state/currency/currency_cubit.dart';
 import '../state/currency/currency_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/currency_formatter.dart';
 
 class CategoryPieChart extends StatefulWidget {
   final Map<String, double> totalsByCategory;
@@ -67,6 +68,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
 
     return BlocBuilder<CurrencyCubit, CurrencyState>(
       builder: (context, currState) {
+        final code = currState.currency.code;
         final symbol = currState.currency.symbol;
 
         return Container(
@@ -104,7 +106,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
                           child: _buildPieChart(entries, centerRadius: 30, sliceRadius: 35),
                         ),
                         const SizedBox(height: 16),
-                        _buildLegendList(entries, symbol, maxItems: 5),
+                        _buildLegendList(entries, symbol, code, maxItems: 3),
                       ],
                     );
                   }
@@ -130,7 +132,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
                       const SizedBox(width: 12),
                       Expanded(
                         flex: 6,
-                        child: _buildLegendList(entries, symbol, maxItems: 5),
+                        child: _buildLegendList(entries, symbol, code, maxItems: 5),
                       ),
                     ],
                   );
@@ -197,7 +199,8 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
 
   Widget _buildLegendList(
     List<MapEntry<String, double>> entries,
-    String symbol, {
+    String symbol,
+    String currencyCode, {
     required int maxItems,
   }) {
     final displayEntries = entries.take(maxItems).toList();
@@ -240,7 +243,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  '$symbol${entry.value.toStringAsFixed(0)} (${percentage.toStringAsFixed(0)}%)',
+                  '${CurrencyFormatter.formatAmount(entry.value, currencyCode: currencyCode, symbolOverride: symbol, decimalDigits: 0)} (${percentage.toStringAsFixed(0)}%)',
                   style: TextStyle(
                     color: AppTheme.textColor.withValues(alpha: 0.8),
                     fontSize: 11,

@@ -103,6 +103,14 @@ class InMemoryExpenseRepository implements ExpenseRepository {
   @override
   Future<void> setBiometricLockEnabled(bool enabled) async => _biometricLockEnabled = enabled;
 
+  bool _hapticFeedbackEnabled = true;
+
+  @override
+  Future<bool> isHapticFeedbackEnabled() async => _hapticFeedbackEnabled;
+
+  @override
+  Future<void> setHapticFeedbackEnabled(bool enabled) async => _hapticFeedbackEnabled = enabled;
+
   int _autoLockIntervalMinutes = 1;
   int? _lastActiveTimestamp;
 

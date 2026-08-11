@@ -7,6 +7,7 @@ import '../state/category/category_cubit.dart';
 import '../state/currency/currency_cubit.dart';
 import '../state/currency/currency_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/currency_formatter.dart';
 
 class ExpenseTile extends StatelessWidget {
   final Expense expense;
@@ -32,8 +33,10 @@ class ExpenseTile extends StatelessWidget {
 
     return BlocBuilder<CurrencyCubit, CurrencyState>(
       builder: (context, currState) {
+        final code = currState.currency.code;
         final symbol = currState.currency.symbol;
-        final amountPrefix = isIncome ? '+$symbol' : '-$symbol';
+        final prefix = isIncome ? '+' : '-';
+        final formattedAmount = '$prefix${CurrencyFormatter.formatAmount(expense.amount, currencyCode: code, symbolOverride: symbol)}';
 
         return TweenAnimationBuilder<double>(
           duration: const Duration(milliseconds: 300),
@@ -180,7 +183,7 @@ class ExpenseTile extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            '$amountPrefix${expense.amount.toStringAsFixed(2)}',
+                            formattedAmount,
                             style: TextStyle(
                               color: amountColor,
                               fontSize: 16,

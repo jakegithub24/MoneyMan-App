@@ -38,6 +38,10 @@ abstract class ExpenseRepository {
   Future<int?> getLastActiveTimestamp();
   Future<void> setLastActiveTimestamp(int timestamp);
 
+  // Preference Settings
+  Future<bool> isHapticFeedbackEnabled();
+  Future<void> setHapticFeedbackEnabled(bool enabled);
+
   // Currency Management
   Future<String> getCurrencyCode();
   Future<String> getCurrencySymbol();

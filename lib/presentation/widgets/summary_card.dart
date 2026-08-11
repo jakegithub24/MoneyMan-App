@@ -5,6 +5,7 @@ import '../state/currency/currency_cubit.dart';
 import '../state/currency/currency_state.dart';
 import '../state/dashboard/dashboard_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/currency_formatter.dart';
 
 class SummaryCard extends StatelessWidget {
   final ExpenseSummary summary;
@@ -32,6 +33,7 @@ class SummaryCard extends StatelessWidget {
 
     return BlocBuilder<CurrencyCubit, CurrencyState>(
       builder: (context, currState) {
+        final code = currState.currency.code;
         final symbol = currState.currency.symbol;
 
         return Column(
@@ -92,7 +94,7 @@ class SummaryCard extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 6.0),
                                     child: Text(
-                                      '$symbol${summary.totalIncome.toStringAsFixed(2)}',
+                                      CurrencyFormatter.formatAmount(summary.totalIncome, currencyCode: code, symbolOverride: symbol),
                                       style: const TextStyle(
                                         color: AppTheme.incomeColor,
                                         fontSize: 18,
@@ -158,7 +160,7 @@ class SummaryCard extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 6.0),
                                     child: Text(
-                                      '$symbol${summary.totalExpense.toStringAsFixed(2)}',
+                                      CurrencyFormatter.formatAmount(summary.totalExpense, currencyCode: code, symbolOverride: symbol),
                                       style: const TextStyle(
                                         color: AppTheme.expenseColor,
                                         fontSize: 18,
@@ -223,7 +225,7 @@ class SummaryCard extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(left: 6.0),
                                 child: Text(
-                                  '${summary.netBalance < 0 ? '-' : ''}$symbol${summary.netBalance.abs().toStringAsFixed(2)}',
+                                  '${summary.netBalance < 0 ? '-' : ''}${CurrencyFormatter.formatAmount(summary.netBalance.abs(), currencyCode: code, symbolOverride: symbol)}',
                                   style: TextStyle(
                                     color: summary.netBalance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
                                     fontSize: 18,
@@ -368,7 +370,7 @@ class SummaryCard extends StatelessWidget {
                           InkWell(
                             onTap: onSetBudgetTap,
                             child: Text(
-                              '$symbol${summary.totalExpense.toStringAsFixed(0)} / $symbol${summary.monthlyBudget.toStringAsFixed(0)}',
+                              '${CurrencyFormatter.formatAmount(summary.totalExpense, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)} / ${CurrencyFormatter.formatAmount(summary.monthlyBudget, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)}',
                               style: TextStyle(
                                 color: AppTheme.textColor.withValues(alpha: 0.8),
                                 fontSize: 13,

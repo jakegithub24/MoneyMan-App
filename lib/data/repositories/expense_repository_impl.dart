@@ -112,6 +112,12 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<void> setLastActiveTimestamp(int timestamp) => datasource.setLastActiveTimestamp(timestamp);
 
   @override
+  Future<bool> isHapticFeedbackEnabled() => datasource.isHapticFeedbackEnabled();
+
+  @override
+  Future<void> setHapticFeedbackEnabled(bool enabled) => datasource.setHapticFeedbackEnabled(enabled);
+
+  @override
   Future<String> getCurrencyCode() => datasource.getCurrencyCode();
 
   @override

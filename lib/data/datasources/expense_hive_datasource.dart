@@ -138,6 +138,16 @@ class ExpenseHiveDatasource {
     await sBox.put('last_active_timestamp', timestamp);
   }
 
+  Future<bool> isHapticFeedbackEnabled() async {
+    final sBox = await settingsBox;
+    return sBox.get('haptic_feedback_enabled', defaultValue: true) as bool;
+  }
+
+  Future<void> setHapticFeedbackEnabled(bool enabled) async {
+    final sBox = await settingsBox;
+    await sBox.put('haptic_feedback_enabled', enabled);
+  }
+
   Future<String> getCurrencyCode() async {
     final sBox = await settingsBox;
     final val = sBox.get('currency_code');
@@ -197,6 +207,7 @@ class ExpenseHiveDatasource {
     await sBox.put('currency_symbol', '₹');
     await sBox.put('security_lock_enabled', false);
     await sBox.put('biometric_lock_enabled', true);
+    await sBox.put('haptic_feedback_enabled', true);
     await sBox.put('auto_lock_interval_minutes', 1);
     await sBox.delete('last_active_timestamp');
     await sBox.put('onboarding_completed', false);

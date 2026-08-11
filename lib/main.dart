@@ -19,6 +19,7 @@ import 'presentation/state/expense_form/expense_form_cubit.dart';
 import 'presentation/state/expense_list/expense_list_cubit.dart';
 import 'presentation/theme/app_theme.dart';
 import 'presentation/utils/activity_tracker.dart';
+import 'presentation/utils/app_haptics.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,9 @@ void main() async {
   final deleteExpenseUseCase = DeleteExpenseUseCase(expenseRepository);
   final listExpensesUseCase = ListExpensesUseCase(expenseRepository);
   final getSummaryUseCase = GetSummaryUseCase(expenseRepository);
+
+  // Load initial Haptic Feedback preference
+  AppHaptics.isEnabled = await expenseRepository.isHapticFeedbackEnabled();
 
   runApp(ExpenseTrackerApp(
     repository: expenseRepository,

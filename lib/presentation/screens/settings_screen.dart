@@ -8,6 +8,8 @@ import '../state/currency/currency_state.dart';
 import '../state/dashboard/dashboard_cubit.dart';
 import '../state/expense_list/expense_list_cubit.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
+import '../utils/currency_formatter.dart';
 import '../widgets/export_data_dialog.dart';
 import '../widgets/import_data_dialog.dart';
 import 'categories_screen.dart';
@@ -35,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   double _currentBudget = 0.0;
   bool _isLockEnabled = false;
   bool _isBiometricEnabled = true;
+  bool _isHapticEnabled = true;
 
   @override
   void initState() {
@@ -47,12 +50,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final budget = await widget.repository.getMonthlyBudget();
     final lockEnabled = await widget.repository.isSecurityLockEnabled();
     final biometricEnabled = await widget.repository.isBiometricLockEnabled();
+    final hapticEnabled = await widget.repository.isHapticFeedbackEnabled();
+    AppHaptics.isEnabled = hapticEnabled;
     setState(() {
       _currentUsername = (username != null && username.trim().isNotEmpty) ? username.trim() : 'User';
       _currentBudget = budget;
       _isLockEnabled = lockEnabled;
       _isBiometricEnabled = biometricEnabled;
+      _isHapticEnabled = hapticEnabled;
     });
+  }
+
+  Future<void> _toggleHapticFeedback(bool enabled) async {
+    await widget.repository.setHapticFeedbackEnabled(enabled);
+    AppHaptics.isEnabled = enabled;
+    if (enabled) {
+      AppHaptics.lightImpact();
+    }
+    await _loadSettings();
   }
 
   Future<void> _updateUsernameDialog() async {
@@ -257,34 +272,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Categories Management Section
-          _buildSectionHeader('CATEGORIES'),
+          // Preferences Section
+          _buildSectionHeader('PREFERENCES'),
           Card(
             color: AppTheme.cardBackgroundColor,
-            child: ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.category_rounded, color: AppTheme.baseHighlightColor),
+                  ),
+                  title: const Text(
+                    'Manage Categories',
+                    style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: const Text(
+                    'Create or delete income and expense categories',
+                    style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                    );
+                  },
                 ),
-                child: const Icon(Icons.category_rounded, color: AppTheme.baseHighlightColor),
-              ),
-              title: const Text(
-                'Manage Categories',
-                style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
-              ),
-              subtitle: const Text(
-                'Create or delete income and expense categories',
-                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
-              ),
-              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CategoriesScreen()),
-                );
-              },
+                const Divider(color: AppTheme.backgroundColor, height: 1),
+                SwitchListTile(
+                  secondary: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.popHighlightColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.vibration_rounded, color: AppTheme.popHighlightColor),
+                  ),
+                  title: const Text(
+                    'Haptic Feedback',
+                    style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: const Text(
+                    'Vibrate on button taps, keypad entry, & actions',
+                    style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+                  ),
+                  value: _isHapticEnabled,
+                  activeThumbColor: AppTheme.baseHighlightColor,
+                  onChanged: _toggleHapticFeedback,
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -311,7 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
                   ),
                   subtitle: Text(
-                    'Current: $symbol${_currentBudget.toStringAsFixed(2)}',
+                    'Current: ${CurrencyFormatter.formatAmount(_currentBudget, currencyCode: currState.currency.code, symbolOverride: symbol)}',
                     style: const TextStyle(color: AppTheme.textColor),
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
