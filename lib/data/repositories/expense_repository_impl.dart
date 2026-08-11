@@ -263,6 +263,9 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
       if (date == null) {
         throw const FormatException(invalidMessage);
       }
+      if (date.isAfter(DateTime.now())) {
+        throw const FormatException('CSV Import failed: Future transaction dates are not allowed.');
+      }
 
       final rawNote = row[5].replaceAll('"', '').trim();
       final note = rawNote.isNotEmpty ? rawNote : null;

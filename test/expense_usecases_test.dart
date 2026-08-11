@@ -1,9 +1,13 @@
 import 'package:flutter_application_101/application/use_cases/add_expense_usecase.dart';
+import 'package:flutter_application_101/application/use_cases/delete_expense_usecase.dart';
 import 'package:flutter_application_101/application/use_cases/get_summary_usecase.dart';
+import 'package:flutter_application_101/application/use_cases/update_expense_usecase.dart';
 import 'package:flutter_application_101/domain/entities/expense.dart';
 import 'package:flutter_application_101/domain/entities/transaction_type.dart';
 import 'package:flutter_application_101/domain/models/expense_summary.dart';
 import 'package:flutter_application_101/domain/repositories/expense_repository.dart';
+import 'package:flutter_application_101/presentation/state/expense_form/expense_form_cubit.dart';
+import 'package:flutter_application_101/presentation/state/expense_form/expense_form_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
@@ -428,6 +432,26 @@ void main() {
       await repository.resetDatabase();
       expect(await repository.isOnboardingCompleted(), isFalse);
       expect(await repository.getUserName(), isNull);
+    });
+
+    test('Future transaction date logging is disabled and rejected', () async {
+      final futureDate = DateTime.now().add(const Duration(days: 5));
+      final cubit = ExpenseFormCubit(
+        addExpenseUseCase: addExpenseUseCase,
+        updateExpenseUseCase: UpdateExpenseUseCase(repository),
+        deleteExpenseUseCase: DeleteExpenseUseCase(repository),
+      );
+
+      await cubit.submitExpense(
+        amount: 100.0,
+        category: 'Food',
+        date: futureDate,
+        type: TransactionType.expense,
+      );
+
+      expect(cubit.state, isA<ExpenseFormError>());
+      final errorState = cubit.state as ExpenseFormError;
+      expect(errorState.message, contains('Future transaction dates are not allowed'));
     });
   });
 }

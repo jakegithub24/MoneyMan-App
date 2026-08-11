@@ -37,6 +37,10 @@ class ExpenseFormCubit extends Cubit<ExpenseFormState> {
       emit(ExpenseFormError('Please select a category'));
       return;
     }
+    if (date.isAfter(DateTime.now())) {
+      emit(ExpenseFormError('Future transaction dates are not allowed. Please select current or past date.'));
+      return;
+    }
 
     emit(ExpenseFormSubmitting());
 

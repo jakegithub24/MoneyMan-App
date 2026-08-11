@@ -91,11 +91,13 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   }
 
   Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final initial = _selectedDate.isAfter(now) ? now : _selectedDate;
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: initial,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: now,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -131,14 +133,16 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       );
 
       if (pickedTime != null) {
+        final newDate = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+        final currentNow = DateTime.now();
         setState(() {
-          _selectedDate = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
+          _selectedDate = newDate.isAfter(currentNow) ? currentNow : newDate;
         });
       }
     }
@@ -156,6 +160,17 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+      final now = DateTime.now();
+      if (_selectedDate.isAfter(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Future transaction dates are not allowed. Please select current or past date.', style: TextStyle(color: AppTheme.textColor)),
+            backgroundColor: AppTheme.expenseColor,
+          ),
+        );
+        return;
+      }
+
       final amount = double.parse(_amountController.text.trim());
       final noteText = _noteController.text.trim();
       final merchantText = _merchantController.text.trim();
