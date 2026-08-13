@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/transaction_type.dart';
 import '../state/category/category_cubit.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 import '../utils/icon_helper.dart';
 
 class CreateCategoryDialog extends StatefulWidget {
@@ -75,6 +76,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
   void _submit() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
+      AppHaptics.vibrate();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter a category name'),
@@ -92,6 +94,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
         );
 
     if (success && mounted) {
+      AppHaptics.mediumImpact();
       Navigator.pop(context, true);
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/repositories/expense_repository.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 import 'security_pin_screen.dart';
 
 class SecuritySettingsScreen extends StatefulWidget {
@@ -130,6 +131,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
   }
 
   Future<void> _toggleSecurityLock(bool enabled) async {
+    AppHaptics.mediumImpact();
     if (enabled) {
       final pin = await Navigator.push<String>(
         context,
@@ -170,6 +172,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
   }
 
   Future<void> _toggleBiometricLock(bool enabled) async {
+    AppHaptics.mediumImpact();
     final currentPin = await widget.repository.getSecurityPin();
     if (currentPin != null && currentPin.isNotEmpty) {
       if (!mounted) return;

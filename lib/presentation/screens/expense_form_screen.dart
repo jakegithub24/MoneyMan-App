@@ -11,6 +11,7 @@ import '../state/currency/currency_state.dart';
 import '../state/expense_form/expense_form_cubit.dart';
 import '../state/expense_form/expense_form_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 import '../widgets/create_category_dialog.dart';
 
 class ExpenseFormScreen extends StatefulWidget {
@@ -162,6 +163,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
     if (_formKey.currentState!.validate()) {
       final now = DateTime.now();
       if (_selectedDate.isAfter(now)) {
+        AppHaptics.heavyImpact();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Future transaction dates are not allowed. Please select current or past date.', style: TextStyle(color: AppTheme.textColor)),
@@ -179,6 +181,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
           : (noteText.isNotEmpty ? noteText : null);
 
       final formCubit = context.read<ExpenseFormCubit>();
+      AppHaptics.mediumImpact();
 
       formCubit.submitExpense(
         existingExpense: widget.expenseToEdit,

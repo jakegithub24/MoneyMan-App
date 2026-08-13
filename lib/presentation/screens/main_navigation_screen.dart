@@ -11,6 +11,7 @@ import 'expense_list_screen.dart';
 import 'onboarding_screen.dart';
 import 'security_pin_screen.dart';
 import '../utils/activity_tracker.dart';
+import '../utils/app_haptics.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final ExpenseRepository repository;
@@ -259,6 +260,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
             elevation: 0,
             onTap: (index) {
               _onUserActivity();
+              AppHaptics.selectionClick();
               setState(() {
                 _currentIndex = index;
               });

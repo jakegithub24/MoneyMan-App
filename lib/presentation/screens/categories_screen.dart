@@ -5,6 +5,7 @@ import '../constants/categories.dart';
 import '../state/category/category_cubit.dart';
 import '../state/category/category_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 import '../widgets/create_category_dialog.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -21,6 +22,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        AppHaptics.selectionClick();
+      }
+    });
   }
 
   @override
@@ -69,6 +75,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
 
     if (confirm == true) {
+      AppHaptics.heavyImpact();
       await categoryCubit.deleteCategory(category.id);
       messenger.showSnackBar(
         SnackBar(

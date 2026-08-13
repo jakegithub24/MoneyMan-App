@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../state/dashboard/dashboard_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 
 class FilterChipBar extends StatelessWidget {
   final DateFilterType selectedFilter;
@@ -39,7 +40,10 @@ class FilterChipBar extends StatelessWidget {
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
-      onSelected: (_) => onFilterSelected(type),
+      onSelected: (_) {
+        AppHaptics.selectionClick();
+        onFilterSelected(type);
+      },
       selectedColor: AppTheme.baseHighlightColor,
       backgroundColor: AppTheme.cardBackgroundColor,
       side: BorderSide(

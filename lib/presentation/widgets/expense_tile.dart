@@ -7,6 +7,7 @@ import '../state/category/category_cubit.dart';
 import '../state/currency/currency_cubit.dart';
 import '../state/currency/currency_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 import '../utils/currency_formatter.dart';
 
 class ExpenseTile extends StatelessWidget {
@@ -66,7 +67,10 @@ class ExpenseTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
-                onTap: onTap,
+                onTap: onTap != null ? () {
+                  AppHaptics.lightImpact();
+                  onTap!();
+                } : null,
                 child: Padding(
                   padding: const EdgeInsets.all(14.0),
                   child: Row(

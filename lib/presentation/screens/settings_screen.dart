@@ -297,6 +297,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
                   onTap: () {
+                    AppHaptics.lightImpact();
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const CategoriesScreen()),
@@ -356,7 +357,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: const TextStyle(color: AppTheme.textColor),
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
-                  onTap: _setBudgetDialog,
+                  onTap: () {
+                    AppHaptics.lightImpact();
+                    _setBudgetDialog();
+                  },
                 ),
               );
             },
@@ -388,6 +392,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
               onTap: () async {
+                AppHaptics.lightImpact();
                 await Navigator.push(
                   context,
                   MaterialPageRoute(

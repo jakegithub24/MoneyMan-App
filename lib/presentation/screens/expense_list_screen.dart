@@ -10,6 +10,7 @@ import '../state/expense_form/expense_form_cubit.dart';
 import '../state/expense_list/expense_list_cubit.dart';
 import '../state/expense_list/expense_list_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 import '../widgets/expense_tile.dart';
 import 'expense_form_screen.dart';
 
@@ -67,6 +68,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
   }
 
   void _onTypeFilterChanged(TransactionType? type, bool onlyRecurring) {
+    AppHaptics.selectionClick();
     setState(() {
       _selectedTypeFilter = type;
       _onlyRecurringFilter = onlyRecurring;
@@ -332,7 +334,10 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                   return RefreshIndicator(
                     color: AppTheme.baseHighlightColor,
                     backgroundColor: AppTheme.cardBackgroundColor,
-                    onRefresh: () => context.read<ExpenseListCubit>().loadExpenses(),
+                    onRefresh: () async {
+                      AppHaptics.mediumImpact();
+                      await context.read<ExpenseListCubit>().loadExpenses();
+                    },
                     child: ListView.builder(
                       padding: const EdgeInsets.only(bottom: 80),
                       itemCount: state.expenses.length,
@@ -383,6 +388,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                             );
                           },
                           onDismissed: (direction) async {
+                            AppHaptics.heavyImpact();
                             final formCubit = context.read<ExpenseFormCubit>();
                             final listCubit = context.read<ExpenseListCubit>();
                             final dashboardCubit = context.read<DashboardCubit>();
@@ -414,6 +420,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                           child: ExpenseTile(
                             expense: expense,
                             onTap: () async {
+                              AppHaptics.lightImpact();
                               final listCubit = context.read<ExpenseListCubit>();
                               final dashboardCubit = context.read<DashboardCubit>();
 

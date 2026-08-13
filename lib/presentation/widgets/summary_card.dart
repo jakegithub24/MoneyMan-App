@@ -5,6 +5,7 @@ import '../state/currency/currency_cubit.dart';
 import '../state/currency/currency_state.dart';
 import '../state/dashboard/dashboard_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_haptics.dart';
 import '../utils/currency_formatter.dart';
 
 class SummaryCard extends StatelessWidget {
@@ -51,7 +52,10 @@ class SummaryCard extends StatelessWidget {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(20),
-                            onTap: onIncomeTap,
+                            onTap: onIncomeTap != null ? () {
+                              AppHaptics.lightImpact();
+                              onIncomeTap!();
+                            } : null,
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -117,7 +121,10 @@ class SummaryCard extends StatelessWidget {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(20),
-                            onTap: onExpenseTap,
+                            onTap: onExpenseTap != null ? () {
+                              AppHaptics.lightImpact();
+                              onExpenseTap!();
+                            } : null,
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -246,7 +253,10 @@ class SummaryCard extends StatelessWidget {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(20),
-                            onTap: onActivityTap,
+                            onTap: onActivityTap != null ? () {
+                              AppHaptics.lightImpact();
+                              onActivityTap!();
+                            } : null,
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -368,7 +378,10 @@ class SummaryCard extends StatelessWidget {
                             ],
                           ),
                           InkWell(
-                            onTap: onSetBudgetTap,
+                            onTap: onSetBudgetTap != null ? () {
+                              AppHaptics.lightImpact();
+                              onSetBudgetTap!();
+                            } : null,
                             child: Text(
                               '${CurrencyFormatter.formatAmount(summary.totalExpense, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)} / ${CurrencyFormatter.formatAmount(summary.monthlyBudget, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)}',
                               style: TextStyle(

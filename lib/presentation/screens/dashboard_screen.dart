@@ -10,6 +10,7 @@ import '../widgets/category_pie_chart.dart';
 import '../widgets/expense_tile.dart';
 import '../widgets/filter_chip_bar.dart';
 import '../widgets/summary_card.dart';
+import '../utils/app_haptics.dart';
 import 'expense_form_screen.dart';
 import 'security_pin_screen.dart';
 import 'settings_screen.dart';
@@ -79,6 +80,7 @@ class DashboardScreen extends StatelessWidget {
             icon: const Icon(Icons.lock_outline_rounded, color: AppTheme.textColor),
             tooltip: 'Lock App',
             onPressed: () async {
+              AppHaptics.heavyImpact();
               final pin = await repository.getSecurityPin();
               final lockEnabled = await repository.isSecurityLockEnabled();
               if (!context.mounted) return;
@@ -109,6 +111,7 @@ class DashboardScreen extends StatelessWidget {
             icon: const Icon(Icons.settings_rounded, color: AppTheme.textColor),
             tooltip: 'Settings & Tools',
             onPressed: () async {
+              AppHaptics.lightImpact();
               final dashboardCubit = context.read<DashboardCubit>();
               await Navigator.push(
                 context,
@@ -166,9 +169,17 @@ class DashboardScreen extends StatelessWidget {
           }
 
           if (state is DashboardLoaded) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Column(
+            return RefreshIndicator(
+              color: AppTheme.baseHighlightColor,
+              backgroundColor: AppTheme.cardBackgroundColor,
+              onRefresh: () async {
+                AppHaptics.mediumImpact();
+                await context.read<DashboardCubit>().loadDashboard(filterType: state.filterType);
+              },
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 24),
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Greeting & Period Info
@@ -447,8 +458,9 @@ class DashboardScreen extends StatelessWidget {
                   const SizedBox(height: 80),
                 ],
               ),
-            );
-          }
+            ),
+          );
+        }
 
           return const SizedBox.shrink();
         },
