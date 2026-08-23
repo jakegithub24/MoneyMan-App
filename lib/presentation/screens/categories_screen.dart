@@ -169,8 +169,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      itemCount: categories.length,
+      itemCount: categories.length + 1,
       itemBuilder: (context, index) {
+        if (index == categories.length) {
+          // Invisible card / spacer to avoid '+' FAB underlapping
+          return const SizedBox(height: 80);
+        }
+
         final cat = categories[index];
 
         return Container(

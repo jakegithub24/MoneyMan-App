@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_application_101/domain/entities/category_item.dart';
 import 'package:flutter_application_101/domain/entities/transaction_type.dart';
 import 'package:flutter_application_101/domain/repositories/category_repository.dart';
+import 'package:flutter_application_101/presentation/state/category/category_cubit.dart';
+import 'package:flutter_application_101/presentation/screens/categories_screen.dart';
 
 class InMemoryCategoryRepository implements CategoryRepository {
   final List<CategoryItem> _storage = [
@@ -117,6 +120,31 @@ void main() {
       await repository.deleteCategory('1');
       final remaining = await repository.getCategories();
       expect(remaining.isEmpty, isTrue);
+    });
+
+    testWidgets('CategoriesScreen renders invisible card at the end of category list to avoid FAB underlap', (tester) async {
+      final categoryCubit = CategoryCubit(categoryRepository: repository);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: BlocProvider<CategoryCubit>.value(
+            value: categoryCubit..loadCategories(),
+            child: const CategoriesScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify category list is shown
+      expect(find.text('Food'), findsOneWidget);
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+
+      // Verify ListView itemCount includes the +1 invisible card spacer
+      final listViewFinder = find.byType(ListView);
+      expect(listViewFinder, findsOneWidget);
+      final ListView listView = tester.widget(listViewFinder);
+      expect(listView.semanticChildCount, equals(2)); // 1 category item + 1 invisible card spacer
     });
   });
 }
