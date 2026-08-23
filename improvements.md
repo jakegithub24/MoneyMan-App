@@ -5,11 +5,11 @@
 4. Add invisible card in the end of 'Expense Categories' and 'Income Categories' list in 'Manage Categories' to avoid '+' (add category) button underlapping~~ (Resolved: Added invisible spacer card at the end of category lists to avoid FAB overlap)
 5. Add icons to feature tabs of 'app lock configuration' in 'Security & Privacy' settings
     5.1 Add 'lock_clock' icon before 'Auto-Lock Interval' without green square around it
-    5.2 ~~'password' icon for 'Change Security PIN'~~ (Resolved: Added password_rounded icon in theme highlight color matching Change Security PIN)
+    5.2 'password' icon for 'Change Security PIN'~~ (Resolved: Added password_rounded icon in theme highlight color matching Change Security PIN)
 6. Bruite-force attack on Security PIN is currently possible
 
 ## Features
-- In 'Reset App Data' feature, user must get warning (confirm) after clicking on 'Reset Database & Start Fresh' button and before 'Confirm Pin'
+- In 'Reset App Data' feature, user must get warning (confirm) after clicking on 'Reset Database & Start Fresh' button and before 'Confirm PIN'~~ (Resolved: Warning confirmation dialog is prompted immediately on tapping Reset Database & Start Fresh before proceeding to PIN confirmation)
 - DRM Protection toggle in settings
 - 'Stats' features
 - Themes

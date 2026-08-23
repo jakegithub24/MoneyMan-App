@@ -534,24 +534,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
               onTap: () async {
-                final lockEnabled = await widget.repository.isSecurityLockEnabled();
-                final pin = await widget.repository.getSecurityPin();
-                if (!context.mounted) return;
-
-                if (lockEnabled && pin != null && pin.isNotEmpty) {
-                  final unlocked = await Navigator.push<bool>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SecurityPinScreen(
-                        mode: PinMode.unlock,
-                        savedPin: pin,
-                      ),
-                    ),
-                  );
-                  if (unlocked != true) return;
-                }
-
-                if (!context.mounted) return;
+                AppHaptics.heavyImpact();
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -581,34 +564,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 );
 
-                if (confirm == true && context.mounted) {
-                  await widget.repository.resetDatabase();
-                  if (context.mounted) {
-                    await context.read<CategoryCubit>().resetCategories();
-                    if (context.mounted) {
-                      context.read<DashboardCubit>().loadDashboard();
-                      context.read<ExpenseListCubit>().loadExpenses();
-                      context.read<CurrencyCubit>().loadCurrency();
-                      widget.onSettingsUpdated();
+                if (confirm != true || !context.mounted) return;
 
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => OnboardingScreen(
-                            repository: widget.repository,
-                            onCompleted: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MainNavigationScreen(repository: widget.repository),
-                                ),
-                              );
-                            },
-                          ),
+                final lockEnabled = await widget.repository.isSecurityLockEnabled();
+                final pin = await widget.repository.getSecurityPin();
+                if (!context.mounted) return;
+
+                if (lockEnabled && pin != null && pin.isNotEmpty) {
+                  final unlocked = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SecurityPinScreen(
+                        mode: PinMode.unlock,
+                        savedPin: pin,
+                      ),
+                    ),
+                  );
+                  if (unlocked != true) return;
+                }
+
+                if (!context.mounted) return;
+                await widget.repository.resetDatabase();
+                if (context.mounted) {
+                  await context.read<CategoryCubit>().resetCategories();
+                  if (context.mounted) {
+                    context.read<DashboardCubit>().loadDashboard();
+                    context.read<ExpenseListCubit>().loadExpenses();
+                    context.read<CurrencyCubit>().loadCurrency();
+                    widget.onSettingsUpdated();
+
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OnboardingScreen(
+                          repository: widget.repository,
+                          onCompleted: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MainNavigationScreen(repository: widget.repository),
+                              ),
+                            );
+                          },
                         ),
-                        (route) => false,
-                      );
-                    }
+                      ),
+                      (route) => false,
+                    );
                   }
                 }
               },
