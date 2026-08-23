@@ -67,7 +67,21 @@ class InMemoryExpenseRepository implements ExpenseRepository {
     String? category,
   }) async {
     final list = await listExpenses(from: from, to: to, category: category);
-    return ExpenseSummary.fromExpenses(list, monthlyBudget: _budget);
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+    final monthExpenses = await listExpenses(from: startOfMonth, to: endOfMonth, category: category);
+    double monthlyExpense = 0.0;
+    for (final e in monthExpenses) {
+      if (e.isExpense) {
+        monthlyExpense += e.amount;
+      }
+    }
+    return ExpenseSummary.fromExpenses(
+      list,
+      monthlyBudget: _budget,
+      monthlyExpense: monthlyExpense,
+    );
   }
 
   double _budget = 0.0;
@@ -306,6 +320,50 @@ void main() {
 
       final summary = await getSummaryUseCase.execute();
       expect(summary.monthlyBudget, equals(1000.0));
+      expect(summary.monthlyExpense, equals(300.0));
+      expect(summary.budgetProgress, closeTo(0.3, 0.001));
+      expect(summary.remainingBudget, equals(700.0));
+    });
+
+    test('Monthly budget progress remains accurate when summary is filtered for This Week or Today', () async {
+      await repository.setMonthlyBudget(1000.0);
+      final now = DateTime.now();
+
+      // Transaction 1: Earlier this month (e.g. 10 days ago, if within same month)
+      final earlyThisMonth = DateTime(now.year, now.month, 1, 10, 0);
+      await addExpenseUseCase.execute(Expense(
+        id: '1',
+        amount: 400.0,
+        category: 'Bills',
+        type: TransactionType.expense,
+        date: earlyThisMonth,
+        createdAt: earlyThisMonth,
+        updatedAt: earlyThisMonth,
+      ));
+
+      // Transaction 2: Today
+      await addExpenseUseCase.execute(Expense(
+        id: '2',
+        amount: 200.0,
+        category: 'Food',
+        type: TransactionType.expense,
+        date: now,
+        createdAt: now,
+        updatedAt: now,
+      ));
+
+      // Filter summary for Today only:
+      final todayFrom = DateTime(now.year, now.month, now.day);
+      final todayTo = DateTime(now.year, now.month, now.day, 23, 59, 59);
+      final todaySummary = await getSummaryUseCase.execute(from: todayFrom, to: todayTo);
+
+      // Today's total expense should be 200
+      expect(todaySummary.totalExpense, equals(200.0));
+      // But Monthly Expense against Monthly Budget (1000) should be 600.0 (400 + 200)
+      expect(todaySummary.monthlyExpense, equals(600.0));
+      expect(todaySummary.monthlyBudget, equals(1000.0));
+      expect(todaySummary.budgetProgress, closeTo(0.6, 0.001));
+      expect(todaySummary.remainingBudget, equals(400.0));
     });
 
     test('Filter list by Income vs Expense vs Recurring', () async {

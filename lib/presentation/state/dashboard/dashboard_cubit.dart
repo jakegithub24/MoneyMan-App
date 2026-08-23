@@ -25,9 +25,10 @@ class DashboardCubit extends Cubit<DashboardState> {
           to = DateTime(now.year, now.month, now.day, 23, 59, 59);
           break;
         case DateFilterType.thisWeek:
-          final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+          final startOfWeek = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
           from = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
-          to = DateTime(now.year, now.month, now.day, 23, 59, 59);
+          final endOfWeek = startOfWeek.add(const Duration(days: 6));
+          to = DateTime(endOfWeek.year, endOfWeek.month, endOfWeek.day, 23, 59, 59);
           break;
         case DateFilterType.thisMonth:
           from = DateTime(now.year, now.month, 1);

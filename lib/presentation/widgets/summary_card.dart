@@ -29,7 +29,7 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = summary.budgetProgress;
-    final isOverBudget = summary.monthlyBudget > 0 && summary.totalExpense > summary.monthlyBudget;
+    final isOverBudget = summary.monthlyBudget > 0 && summary.monthlyExpense > summary.monthlyBudget;
     final isNearBudget = summary.monthlyBudget > 0 && progress >= 0.8 && !isOverBudget;
 
     return BlocBuilder<CurrencyCubit, CurrencyState>(
@@ -383,7 +383,7 @@ class SummaryCard extends StatelessWidget {
                               onSetBudgetTap!();
                             } : null,
                             child: Text(
-                              '${CurrencyFormatter.formatAmount(summary.totalExpense, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)} / ${CurrencyFormatter.formatAmount(summary.monthlyBudget, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)}',
+                              '${CurrencyFormatter.formatAmount(summary.monthlyExpense, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)} / ${CurrencyFormatter.formatAmount(summary.monthlyBudget, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)}',
                               style: TextStyle(
                                 color: AppTheme.textColor.withValues(alpha: 0.8),
                                 fontSize: 13,

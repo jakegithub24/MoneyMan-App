@@ -72,7 +72,23 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   }) async {
     final filtered = await listExpenses(from: from, to: to, category: category);
     final monthlyBudget = await getMonthlyBudget();
-    return ExpenseSummary.fromExpenses(filtered, monthlyBudget: monthlyBudget);
+
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+    final monthExpenses = await listExpenses(from: startOfMonth, to: endOfMonth, category: category);
+    double monthlyExpense = 0.0;
+    for (final e in monthExpenses) {
+      if (e.isExpense) {
+        monthlyExpense += e.amount;
+      }
+    }
+
+    return ExpenseSummary.fromExpenses(
+      filtered,
+      monthlyBudget: monthlyBudget,
+      monthlyExpense: monthlyExpense,
+    );
   }
 
   @override
