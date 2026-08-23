@@ -6,6 +6,7 @@ import '../../domain/entities/currency_item.dart';
 import '../../domain/repositories/expense_repository.dart';
 import '../state/currency/currency_cubit.dart';
 import '../theme/app_theme.dart';
+import '../utils/storage_permission_helper.dart';
 import '../widgets/currency_selector_dialog.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -135,6 +136,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       await widget.repository.setUserName(name);
       await widget.repository.setCurrency(selectedCode, selectedSymbol);
       await widget.repository.setOnboardingCompleted(true);
+
+      // Prompt for Storage Permission on first start (for CSV import/export)
+      if (mounted) {
+        await StoragePermissionHelper.requestOnFirstStart(context);
+      }
 
       try {
         if (mounted) {

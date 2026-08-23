@@ -10,6 +10,7 @@ import '../state/expense_list/expense_list_cubit.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_haptics.dart';
 import '../utils/currency_formatter.dart';
+import '../utils/storage_permission_helper.dart';
 import '../widgets/export_data_dialog.dart';
 import '../widgets/import_data_dialog.dart';
 import 'categories_screen.dart';
@@ -434,7 +435,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
               trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
-              onTap: () {
+              onTap: () async {
+                AppHaptics.lightImpact();
+                final granted = await StoragePermissionHelper.requestStoragePermission(
+                  context,
+                  showRationale: true,
+                );
+                if (!granted) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Storage permission is required to export CSV data.',
+                          style: TextStyle(color: AppTheme.textColor),
+                        ),
+                        backgroundColor: AppTheme.expenseColor,
+                      ),
+                    );
+                  }
+                  return;
+                }
+                if (!context.mounted) return;
                 showDialog(
                   context: context,
                   builder: (_) => ExportDataDialog(repository: widget.repository),
@@ -463,7 +484,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
               trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
-              onTap: () {
+              onTap: () async {
+                AppHaptics.lightImpact();
+                final granted = await StoragePermissionHelper.requestStoragePermission(
+                  context,
+                  showRationale: true,
+                );
+                if (!granted) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Storage permission is required to import CSV data.',
+                          style: TextStyle(color: AppTheme.textColor),
+                        ),
+                        backgroundColor: AppTheme.expenseColor,
+                      ),
+                    );
+                  }
+                  return;
+                }
+                if (!context.mounted) return;
                 showDialog(
                   context: context,
                   builder: (_) => ImportDataDialog(repository: widget.repository),

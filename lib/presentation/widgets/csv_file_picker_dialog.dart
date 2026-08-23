@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../utils/storage_permission_helper.dart';
 
 class CsvFilePickerDialog extends StatefulWidget {
   final String initialPath;
@@ -43,6 +44,24 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
       _selectedFile = null; // All files un-selected on load/navigation
     });
 
+    final hasPerm = await StoragePermissionHelper.hasStoragePermission();
+    if (!hasPerm) {
+      if (!mounted) return;
+      final granted = await StoragePermissionHelper.requestStoragePermission(
+        context,
+        showRationale: true,
+      );
+      if (!granted) {
+        if (mounted) {
+          setState(() {
+            _errorMessage = 'Storage permission is required to browse CSV files.';
+            _isLoading = false;
+          });
+        }
+        return;
+      }
+    }
+
     try {
       if (!await dir.exists()) {
         final root = Directory(rootBoundary);
@@ -64,18 +83,22 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
           .toList();
       csvsOnly.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
 
-      setState(() {
-        _currentDir = dir;
-        _subDirectories = dirsOnly;
-        _csvFiles = csvsOnly;
-        _isLoading = false;
-        _selectedFile = null;
-      });
+      if (mounted) {
+        setState(() {
+          _currentDir = dir;
+          _subDirectories = dirsOnly;
+          _csvFiles = csvsOnly;
+          _isLoading = false;
+          _selectedFile = null;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Cannot access folder: ${e.toString()}';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Cannot access folder: ${e.toString()}';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -187,10 +210,27 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
                       ? Center(
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              _errorMessage,
-                              style: const TextStyle(color: AppTheme.expenseColor, fontSize: 13),
-                              textAlign: TextAlign.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.error_outline_rounded, color: AppTheme.expenseColor, size: 36),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _errorMessage,
+                                  style: const TextStyle(color: AppTheme.expenseColor, fontSize: 13),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 12),
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.baseHighlightColor,
+                                    foregroundColor: AppTheme.backgroundColor,
+                                  ),
+                                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                                  label: const Text('Grant Permission / Retry'),
+                                  onPressed: () => _loadDirectoryContents(_currentDir),
+                                ),
+                              ],
                             ),
                           ),
                         )

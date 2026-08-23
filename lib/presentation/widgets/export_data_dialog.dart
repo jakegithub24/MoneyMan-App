@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../domain/entities/transaction_type.dart';
 import '../../domain/repositories/expense_repository.dart';
 import '../theme/app_theme.dart';
+import '../utils/storage_permission_helper.dart';
 import 'folder_picker_dialog.dart';
 
 enum ExportPeriod { today, week, month, year, all, custom }
@@ -125,6 +126,13 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
   }
 
   Future<void> _openFolderPickerUI() async {
+    final hasPermission = await StoragePermissionHelper.requestStoragePermission(
+      context,
+      showRationale: true,
+    );
+    if (!hasPermission) return;
+    if (!mounted) return;
+
     final selectedFolder = await showDialog<String>(
       context: context,
       builder: (_) => FolderPickerDialog(initialPath: _selectedFolderPath),
@@ -147,14 +155,32 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
   }
 
   Future<void> _downloadCsvWithLocationPicker() async {
+    final hasPermission = await StoragePermissionHelper.requestStoragePermission(
+      context,
+      showRationale: true,
+    );
+    if (!hasPermission) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Storage permission is required to save CSV files.', style: TextStyle(color: AppTheme.textColor)),
+            backgroundColor: AppTheme.expenseColor,
+          ),
+        );
+      }
+      return;
+    }
+
     final rawPrefix = _fileNamePrefixController.text.trim();
     if (rawPrefix.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a file name prefix'),
-          backgroundColor: AppTheme.expenseColor,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please enter a file name prefix'),
+            backgroundColor: AppTheme.expenseColor,
+          ),
+        );
+      }
       return;
     }
 

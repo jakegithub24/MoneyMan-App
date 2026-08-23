@@ -5,6 +5,7 @@ import '../../domain/repositories/expense_repository.dart';
 import '../state/dashboard/dashboard_cubit.dart';
 import '../state/expense_list/expense_list_cubit.dart';
 import '../theme/app_theme.dart';
+import '../utils/storage_permission_helper.dart';
 import 'csv_file_picker_dialog.dart';
 
 class ImportDataDialog extends StatefulWidget {
@@ -32,6 +33,13 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
   }
 
   Future<void> _pickCsvFile() async {
+    final hasPermission = await StoragePermissionHelper.requestStoragePermission(
+      context,
+      showRationale: true,
+    );
+    if (!hasPermission) return;
+    if (!mounted) return;
+
     final path = await showDialog<String>(
       context: context,
       builder: (_) => const CsvFilePickerDialog(),
@@ -49,6 +57,17 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
     String csvContent = '';
 
     if (_selectedFilePath != null && _selectedFilePath!.isNotEmpty) {
+      final hasPermission = await StoragePermissionHelper.requestStoragePermission(
+        context,
+        showRationale: true,
+      );
+      if (!hasPermission) {
+        setState(() {
+          _errorMessage = 'Storage permission is required to read CSV file.';
+        });
+        return;
+      }
+
       try {
         final file = File(_selectedFilePath!);
         if (await file.exists()) {
