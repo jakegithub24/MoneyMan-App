@@ -54,6 +54,7 @@
 ### 🔐 Security & Privacy
 - **PIN Lock Screen**: 4-digit security PIN protection with masked keypads and randomized vibration feedback.
 - **Biometric Authentication**: Fingerprint & Face Unlock integration via `local_auth`.
+- **DRM & Screen Protection**: Hardware-backed `FLAG_SECURE` DRM protection blocking screenshots and screen recording across the application (enable without PIN; disable requires PIN verification with biometrics excluded).
 - **Auto-Lock Interval**: Configurable inactivity auto-lock (1 min, 5 min, 10 min, 30 min, 1 hour) tracked via lifecycle and activity listeners.
 - **Safe Reset Safeguards**: Database reset workflow featuring explicit confirmation dialogs before PIN authorization to prevent accidental data wipes.
 

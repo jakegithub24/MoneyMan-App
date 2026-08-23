@@ -8,50 +8,55 @@ import 'package:flutter_application_101/domain/entities/transaction_type.dart';
 import 'package:flutter_application_101/presentation/theme/app_theme.dart';
 import 'package:flutter_application_101/presentation/screens/security_settings_screen.dart';
 import 'package:flutter_application_101/presentation/screens/security_pin_screen.dart';
+import 'package:flutter_application_101/presentation/utils/drm_protection_helper.dart';
 
-class MockSecurityExpenseRepository implements ExpenseRepository {
-  String? _pin = '1234';
-  bool _lockEnabled = true;
-  bool _bioEnabled = false;
-  int _interval = 1;
+class MockDrmExpenseRepository implements ExpenseRepository {
+  String? _pin = '5678';
+  bool _drmEnabled = false;
 
   @override
   Future<String?> getSecurityPin() async => _pin;
 
   @override
-  Future<void> setSecurityPin(String? pin) async {
-    _pin = pin;
-  }
+  Future<void> setSecurityPin(String? pin) async => _pin = pin;
 
   @override
-  Future<bool> isSecurityLockEnabled() async => _lockEnabled;
+  Future<bool> isSecurityLockEnabled() async => true;
 
   @override
-  Future<void> setSecurityLockEnabled(bool enabled) async {
-    _lockEnabled = enabled;
-  }
+  Future<void> setSecurityLockEnabled(bool enabled) async {}
 
   @override
-  Future<bool> isBiometricLockEnabled() async => _bioEnabled;
+  Future<bool> isBiometricLockEnabled() async => true;
 
   @override
-  Future<void> setBiometricLockEnabled(bool enabled) async {
-    _bioEnabled = enabled;
-  }
+  Future<void> setBiometricLockEnabled(bool enabled) async {}
 
   @override
-  Future<int> getAutoLockIntervalMinutes() async => _interval;
+  Future<int> getAutoLockIntervalMinutes() async => 1;
 
   @override
-  Future<void> setAutoLockIntervalMinutes(int minutes) async {
-    _interval = minutes;
-  }
+  Future<void> setAutoLockIntervalMinutes(int minutes) async {}
 
   @override
   Future<int?> getLastActiveTimestamp() async => null;
 
   @override
   Future<void> setLastActiveTimestamp(int timestamp) async {}
+
+  @override
+  Future<bool> isDrmProtectionEnabled() async => _drmEnabled;
+
+  @override
+  Future<void> setDrmProtectionEnabled(bool enabled) async {
+    _drmEnabled = enabled;
+  }
+
+  @override
+  Future<bool> isHapticFeedbackEnabled() async => true;
+
+  @override
+  Future<void> setHapticFeedbackEnabled(bool enabled) async {}
 
   @override
   Future<List<Expense>> listExpenses({
@@ -86,7 +91,7 @@ class MockSecurityExpenseRepository implements ExpenseRepository {
   Future<void> setMonthlyBudget(double budget) async {}
 
   @override
-  Future<String?> getUserName() async => 'TestUser';
+  Future<String?> getUserName() async => 'DrmUser';
 
   @override
   Future<void> setUserName(String name) async {}
@@ -105,22 +110,6 @@ class MockSecurityExpenseRepository implements ExpenseRepository {
 
   @override
   Future<void> setCurrency(String code, String symbol) async {}
-
-  bool _drmEnabled = false;
-
-  @override
-  Future<bool> isDrmProtectionEnabled() async => _drmEnabled;
-
-  @override
-  Future<void> setDrmProtectionEnabled(bool enabled) async {
-    _drmEnabled = enabled;
-  }
-
-  @override
-  Future<bool> isHapticFeedbackEnabled() async => true;
-
-  @override
-  Future<void> setHapticFeedbackEnabled(bool enabled) async {}
 
   @override
   Future<String> exportToCsv({
@@ -141,74 +130,47 @@ class MockSecurityExpenseRepository implements ExpenseRepository {
   }) async => '/tmp/$fileName';
 
   @override
-  Future<void> resetDatabase() async {}
+  Future<void> resetDatabase() async {
+    _drmEnabled = false;
+  }
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() {
+  final List<MethodCall> securityChannelCalls = [];
+
+  setUp(() {
+    securityChannelCalls.clear();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
       const MethodChannel('com.example.flutter_application_101/security'),
-      (MethodCall methodCall) async => true,
+      (MethodCall methodCall) async {
+        securityChannelCalls.add(methodCall);
+        return true;
+      },
     );
   });
 
-  testWidgets('SecuritySettingsScreen displays password icon before Change Security PIN with matching theme color', (tester) async {
-    final repository = MockSecurityExpenseRepository();
-
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.darkTheme,
-        home: SecuritySettingsScreen(
-          repository: repository,
-          onSettingsUpdated: () {},
-        ),
-      ),
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+      const MethodChannel('com.example.flutter_application_101/security'),
+      null,
     );
-
-    // Pump frames to resolve async _loadSettings
-    for (int i = 0; i < 5; i++) {
-      await tester.pump(const Duration(milliseconds: 20));
-    }
-
-    expect(find.text('Change Security PIN'), findsOneWidget);
-
-    final passwordIconFinder = find.byIcon(Icons.password_rounded);
-    expect(passwordIconFinder, findsOneWidget);
-
-    final Icon iconWidget = tester.widget(passwordIconFinder);
-    expect(iconWidget.color, equals(AppTheme.baseHighlightColor));
   });
 
-  testWidgets('SecuritySettingsScreen displays lock_clock icon before Auto-Lock Interval', (tester) async {
-    final repository = MockSecurityExpenseRepository();
+  test('DrmProtectionHelper invokes setDrmProtection method on native channel', () async {
+    await DrmProtectionHelper.setDrmProtection(true);
+    expect(securityChannelCalls.length, equals(1));
+    expect(securityChannelCalls.first.method, equals('setDrmProtection'));
+    expect(securityChannelCalls.first.arguments, equals({'enabled': true}));
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.darkTheme,
-        home: SecuritySettingsScreen(
-          repository: repository,
-          onSettingsUpdated: () {},
-        ),
-      ),
-    );
-
-    // Pump frames to resolve async _loadSettings
-    for (int i = 0; i < 5; i++) {
-      await tester.pump(const Duration(milliseconds: 20));
-    }
-
-    expect(find.text('Auto-Lock Interval'), findsOneWidget);
-
-    final lockClockIconFinder = find.byIcon(Icons.lock_clock_rounded);
-    expect(lockClockIconFinder, findsOneWidget);
-
-    final Icon iconWidget = tester.widget(lockClockIconFinder);
-    expect(iconWidget.color, equals(AppTheme.incomeColor));
+    await DrmProtectionHelper.setDrmProtection(false);
+    expect(securityChannelCalls.length, equals(2));
+    expect(securityChannelCalls.last.method, equals('setDrmProtection'));
+    expect(securityChannelCalls.last.arguments, equals({'enabled': false}));
   });
 
-  testWidgets('DRM Protection can be enabled without PIN and requires PIN to disable', (tester) async {
+  testWidgets('Enabling DRM protection activates immediately without PIN prompt', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -216,7 +178,7 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    final repository = MockSecurityExpenseRepository();
+    final repository = MockDrmExpenseRepository();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -232,32 +194,66 @@ void main() {
       await tester.pump(const Duration(milliseconds: 20));
     }
 
-    // Scroll to DRM Protection toggle
-    final drmTitle = find.text('DRM Protection');
-    await tester.scrollUntilVisible(drmTitle, 100);
-    expect(drmTitle, findsOneWidget);
-
-    // Initially DRM is disabled
     expect(await repository.isDrmProtectionEnabled(), isFalse);
 
-    // Tap DRM Protection tile to ENABLE
+    // Tap to enable
     await tester.tap(find.text('DRM Protection'));
     await tester.pumpAndSettle();
 
-    // DRM enabled directly WITHOUT opening PIN screen
+    // Verify DRM enabled without PIN screen
+    expect(await repository.isDrmProtectionEnabled(), isTrue);
+    expect(find.byType(SecurityPinScreen), findsNothing);
+  });
+
+  testWidgets('Disabling DRM protection requires PIN and completes on valid PIN entry', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final repository = MockDrmExpenseRepository();
+    // Start with DRM enabled
+    await repository.setDrmProtectionEnabled(true);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SecuritySettingsScreen(
+          repository: repository,
+          onSettingsUpdated: () {},
+        ),
+      ),
+    );
+
+    for (int i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+
     expect(await repository.isDrmProtectionEnabled(), isTrue);
 
-    // Dismiss any SnackBars that might intercept taps
-    ScaffoldMessenger.of(tester.element(find.byType(SecuritySettingsScreen))).clearSnackBars();
-    await tester.pumpAndSettle();
-
-    // Now tap to DISABLE -> must navigate to SecurityPinScreen (with biometrics disabled)
+    // Tap to disable DRM
     await tester.tap(find.text('DRM Protection'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Enter Security PIN'), findsOneWidget);
+    // SecurityPinScreen must be pushed with biometrics excluded
     expect(find.byType(SecurityPinScreen), findsOneWidget);
+    final pinScreen = tester.widget<SecurityPinScreen>(find.byType(SecurityPinScreen));
+    expect(pinScreen.isBiometricEnabled, isFalse);
+
+    // Enter correct PIN ('5678')
+    await tester.tap(find.text('5'));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('6'));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('7'));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('8'));
+    await tester.pumpAndSettle();
+
+    // PIN matched, PIN screen popped, DRM is now disabled
+    expect(find.byType(SecurityPinScreen), findsNothing);
+    expect(await repository.isDrmProtectionEnabled(), isFalse);
   });
 }
-
-

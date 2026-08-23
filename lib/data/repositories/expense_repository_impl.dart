@@ -134,6 +134,12 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<void> setHapticFeedbackEnabled(bool enabled) => datasource.setHapticFeedbackEnabled(enabled);
 
   @override
+  Future<bool> isDrmProtectionEnabled() => datasource.isDrmProtectionEnabled();
+
+  @override
+  Future<void> setDrmProtectionEnabled(bool enabled) => datasource.setDrmProtectionEnabled(enabled);
+
+  @override
   Future<String> getCurrencyCode() => datasource.getCurrencyCode();
 
   @override

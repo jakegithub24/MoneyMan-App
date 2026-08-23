@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/repositories/expense_repository.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_haptics.dart';
+import '../utils/drm_protection_helper.dart';
 import 'security_pin_screen.dart';
 
 class SecuritySettingsScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class SecuritySettingsScreen extends StatefulWidget {
 class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
   bool _isLockEnabled = false;
   bool _isBiometricEnabled = true;
+  bool _isDrmEnabled = false;
   String? _savedPin;
   int _autoLockIntervalMinutes = 1;
 
@@ -35,9 +37,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     final pin = await widget.repository.getSecurityPin();
     final autoLockInterval = await widget.repository.getAutoLockIntervalMinutes();
     final biometricEnabled = await widget.repository.isBiometricLockEnabled();
+    final drmEnabled = await widget.repository.isDrmProtectionEnabled();
     setState(() {
       _isLockEnabled = lockEnabled;
       _isBiometricEnabled = biometricEnabled;
+      _isDrmEnabled = drmEnabled;
       _savedPin = pin;
       _autoLockIntervalMinutes = autoLockInterval;
     });
@@ -192,6 +196,71 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     await widget.repository.setBiometricLockEnabled(enabled);
     await _loadSettings();
     widget.onSettingsUpdated();
+  }
+
+  Future<void> _toggleDrmProtection(bool enabled) async {
+    AppHaptics.mediumImpact();
+    if (enabled) {
+      // User can turn it ON without security pin
+      await widget.repository.setDrmProtectionEnabled(true);
+      await DrmProtectionHelper.setDrmProtection(true);
+      await _loadSettings();
+      widget.onSettingsUpdated();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'DRM protection enabled (screenshots & screen recording blocked)',
+              style: TextStyle(color: AppTheme.textColor),
+            ),
+            backgroundColor: AppTheme.cardBackgroundColor,
+          ),
+        );
+      }
+    } else {
+      // User has to enter Security PIN (no biometrics) to disable it
+      final currentPin = await widget.repository.getSecurityPin();
+      if (currentPin != null && currentPin.isNotEmpty) {
+        if (!mounted) return;
+        final unlocked = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SecurityPinScreen(
+              mode: PinMode.unlock,
+              savedPin: currentPin,
+              isBiometricEnabled: false,
+            ),
+          ),
+        );
+        if (unlocked != true) return;
+      } else {
+        if (!mounted) return;
+        final newPin = await Navigator.push<String>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const SecurityPinScreen(mode: PinMode.setup),
+          ),
+        );
+        if (newPin == null || newPin.isEmpty) return;
+        await widget.repository.setSecurityPin(newPin);
+      }
+
+      await widget.repository.setDrmProtectionEnabled(false);
+      await DrmProtectionHelper.setDrmProtection(false);
+      await _loadSettings();
+      widget.onSettingsUpdated();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'DRM protection disabled',
+              style: TextStyle(color: AppTheme.textColor),
+            ),
+            backgroundColor: AppTheme.cardBackgroundColor,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildSectionHeader(String title) {
@@ -354,6 +423,35 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   ),
                 ],
               ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildSectionHeader('DRM & SCREEN PRIVACY'),
+          Card(
+            color: AppTheme.cardBackgroundColor,
+            child: SwitchListTile(
+              secondary: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.incomeColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.no_photography_rounded,
+                  color: AppTheme.incomeColor,
+                ),
+              ),
+              title: const Text(
+                'DRM Protection',
+                style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              ),
+              subtitle: const Text(
+                'Block screenshots & screen recordings across app',
+                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+              ),
+              value: _isDrmEnabled,
+              activeThumbColor: AppTheme.baseHighlightColor,
+              onChanged: _toggleDrmProtection,
             ),
           ),
         ],

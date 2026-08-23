@@ -10,7 +10,7 @@
 
 ## Features
 - In 'Reset App Data' feature, user must get warning (confirm) after clicking on 'Reset Database & Start Fresh' button and before 'Confirm PIN'~~ (Resolved: Warning confirmation dialog is prompted immediately on tapping Reset Database & Start Fresh before proceeding to PIN confirmation)
-- DRM Protection toggle in settings
+- DRM Protection toggle in settings~~ (Resolved: Added DRM protection toggle in Security & Privacy settings; enable without PIN, disable requires PIN with biometrics excluded)
 - 'Stats' features
 - Themes
 - On tapping section of pie-chart, navigate user to 'Transactions' with category pre-selected according to the pie-chart section.~~ (Resolved: Tapping pie-chart slices or legend items filters ExpenseListCubit by the tapped category and switches navigation to Transactions tab)

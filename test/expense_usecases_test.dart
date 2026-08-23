@@ -118,12 +118,19 @@ class InMemoryExpenseRepository implements ExpenseRepository {
   Future<void> setBiometricLockEnabled(bool enabled) async => _biometricLockEnabled = enabled;
 
   bool _hapticFeedbackEnabled = true;
+  bool _drmProtectionEnabled = false;
 
   @override
   Future<bool> isHapticFeedbackEnabled() async => _hapticFeedbackEnabled;
 
   @override
   Future<void> setHapticFeedbackEnabled(bool enabled) async => _hapticFeedbackEnabled = enabled;
+
+  @override
+  Future<bool> isDrmProtectionEnabled() async => _drmProtectionEnabled;
+
+  @override
+  Future<void> setDrmProtectionEnabled(bool enabled) async => _drmProtectionEnabled = enabled;
 
   int _autoLockIntervalMinutes = 1;
   int? _lastActiveTimestamp;
@@ -259,6 +266,7 @@ class InMemoryExpenseRepository implements ExpenseRepository {
     _currencySymbol = '₹';
     _securityPin = null;
     _lockEnabled = false;
+    _drmProtectionEnabled = false;
     _autoLockIntervalMinutes = 1;
     _lastActiveTimestamp = null;
     _userName = null;

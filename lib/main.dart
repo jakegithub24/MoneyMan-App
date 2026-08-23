@@ -20,6 +20,7 @@ import 'presentation/state/expense_list/expense_list_cubit.dart';
 import 'presentation/theme/app_theme.dart';
 import 'presentation/utils/activity_tracker.dart';
 import 'presentation/utils/app_haptics.dart';
+import 'presentation/utils/drm_protection_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +40,10 @@ void main() async {
 
   // Load initial Haptic Feedback preference
   AppHaptics.isEnabled = await expenseRepository.isHapticFeedbackEnabled();
+
+  // Load initial DRM protection preference
+  final drmEnabled = await expenseRepository.isDrmProtectionEnabled();
+  await DrmProtectionHelper.setDrmProtection(drmEnabled);
 
   runApp(ExpenseTrackerApp(
     repository: expenseRepository,

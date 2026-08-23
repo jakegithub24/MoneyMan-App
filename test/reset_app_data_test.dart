@@ -116,6 +116,12 @@ class MockResetExpenseRepository implements ExpenseRepository {
   Future<void> setHapticFeedbackEnabled(bool enabled) async {}
 
   @override
+  Future<bool> isDrmProtectionEnabled() async => false;
+
+  @override
+  Future<void> setDrmProtectionEnabled(bool enabled) async {}
+
+  @override
   Future<String> exportToCsv({
     TransactionType? type,
     DateTime? from,
