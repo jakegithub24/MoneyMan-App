@@ -14,3 +14,4 @@
 - 'Stats' features
 - Themes
 - On tapping section of pie-chart, navigate user to 'Transactions' with category pre-selected according to the pie-chart section.~~ (Resolved: Tapping pie-chart slices or legend items filters ExpenseListCubit by the tapped category and switches navigation to Transactions tab)
+- Duress PIN (resets app if entered Duress PIN)
