@@ -330,7 +330,17 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   ),
                   const Divider(color: AppTheme.backgroundColor, height: 1),
                   ListTile(
-                    leading: const SizedBox(width: 40),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.incomeColor.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.lock_clock_rounded,
+                        color: AppTheme.incomeColor,
+                      ),
+                    ),
                     title: const Text(
                       'Auto-Lock Interval',
                       style: TextStyle(color: AppTheme.textColor, fontSize: 14, fontWeight: FontWeight.w600),

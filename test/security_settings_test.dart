@@ -159,4 +159,32 @@ void main() {
     final Icon iconWidget = tester.widget(passwordIconFinder);
     expect(iconWidget.color, equals(AppTheme.baseHighlightColor));
   });
+
+  testWidgets('SecuritySettingsScreen displays lock_clock icon before Auto-Lock Interval', (tester) async {
+    final repository = MockSecurityExpenseRepository();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SecuritySettingsScreen(
+          repository: repository,
+          onSettingsUpdated: () {},
+        ),
+      ),
+    );
+
+    // Pump frames to resolve async _loadSettings
+    for (int i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+
+    expect(find.text('Auto-Lock Interval'), findsOneWidget);
+
+    final lockClockIconFinder = find.byIcon(Icons.lock_clock_rounded);
+    expect(lockClockIconFinder, findsOneWidget);
+
+    final Icon iconWidget = tester.widget(lockClockIconFinder);
+    expect(iconWidget.color, equals(AppTheme.incomeColor));
+  });
 }
+
