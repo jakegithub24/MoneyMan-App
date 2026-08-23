@@ -222,6 +222,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
             _currentIndex = 1;
           });
         },
+        onNavigateToTransactionsWithCategory: (category) {
+          context.read<ExpenseListCubit>().filterByCategory(category);
+          setState(() {
+            _currentIndex = 1;
+          });
+        },
       ),
       const ExpenseListScreen(),
     ];

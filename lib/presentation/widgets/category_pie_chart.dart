@@ -11,11 +11,13 @@ import '../utils/currency_formatter.dart';
 class CategoryPieChart extends StatefulWidget {
   final Map<String, double> totalsByCategory;
   final double totalAmount;
+  final Function(String category)? onCategoryTap;
 
   const CategoryPieChart({
     super.key,
     required this.totalsByCategory,
     required this.totalAmount,
+    this.onCategoryTap,
   });
 
   @override
@@ -163,6 +165,15 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
               }
               touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
             });
+            if ((event is FlTapUpEvent || event is FlPanEndEvent) &&
+                pieTouchResponse != null &&
+                pieTouchResponse.touchedSection != null) {
+              final sectionIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+              if (sectionIndex >= 0 && sectionIndex < entries.length) {
+                final categoryName = entries[sectionIndex].key;
+                widget.onCategoryTap?.call(categoryName);
+              }
+            }
           },
         ),
         borderData: FlBorderData(show: false),
@@ -215,43 +226,50 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
         final color = _chartPalette[index % _chartPalette.length];
 
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  catInfo.name,
-                  style: const TextStyle(
-                    color: AppTheme.textColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () => widget.onCategoryTap?.call(entry.key),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+              child: Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 4),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  '${CurrencyFormatter.formatAmount(entry.value, currencyCode: currencyCode, symbolOverride: symbol, decimalDigits: 0)} (${percentage.toStringAsFixed(0)}%)',
-                  style: TextStyle(
-                    color: AppTheme.textColor.withValues(alpha: 0.8),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      catInfo.name,
+                      style: const TextStyle(
+                        color: AppTheme.textColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '${CurrencyFormatter.formatAmount(entry.value, currencyCode: currencyCode, symbolOverride: symbol, decimalDigits: 0)} (${percentage.toStringAsFixed(0)}%)',
+                      style: TextStyle(
+                        color: AppTheme.textColor.withValues(alpha: 0.8),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       }).toList(),

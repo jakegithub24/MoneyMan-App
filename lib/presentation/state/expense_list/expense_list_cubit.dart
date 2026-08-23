@@ -50,6 +50,16 @@ class ExpenseListCubit extends Cubit<ExpenseListState> {
     loadExpenses();
   }
 
+  void filterByCategory(String category, {TransactionType? type}) {
+    _currentCategory = category;
+    _currentQuery = '';
+    _currentType = type;
+    _onlyRecurring = false;
+    _currentFrom = null;
+    _currentTo = null;
+    loadExpenses();
+  }
+
   void setSearchQuery(String query) {
     _currentQuery = query;
     loadExpenses();

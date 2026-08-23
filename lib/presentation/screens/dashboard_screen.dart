@@ -19,12 +19,14 @@ class DashboardScreen extends StatelessWidget {
   final ExpenseRepository repository;
   final VoidCallback onSeeAllPressed;
   final Function(TransactionType? type)? onNavigateToTransactionsWithFilter;
+  final Function(String category)? onNavigateToTransactionsWithCategory;
 
   const DashboardScreen({
     super.key,
     required this.repository,
     required this.onSeeAllPressed,
     this.onNavigateToTransactionsWithFilter,
+    this.onNavigateToTransactionsWithCategory,
   });
 
   @override
@@ -270,6 +272,14 @@ class DashboardScreen extends StatelessWidget {
                   CategoryPieChart(
                     totalsByCategory: state.summary.totalsByCategory,
                     totalAmount: state.summary.totalExpense,
+                    onCategoryTap: (category) {
+                      AppHaptics.lightImpact();
+                      if (onNavigateToTransactionsWithCategory != null) {
+                        onNavigateToTransactionsWithCategory!(category);
+                      } else {
+                        onSeeAllPressed();
+                      }
+                    },
                   ),
 
                   // Quick Action Buttons for Income vs Expense
