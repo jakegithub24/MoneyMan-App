@@ -265,21 +265,6 @@ class DashboardScreen extends StatelessWidget {
                         onSeeAllPressed();
                       }
                     },
-                    onSetBudgetTap: () async {
-                      final dashboardCubit = context.read<DashboardCubit>();
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => SettingsScreen(
-                            repository: repository,
-                            onSettingsUpdated: () {
-                              dashboardCubit.loadDashboard();
-                            },
-                          ),
-                        ),
-                      );
-                      dashboardCubit.loadDashboard();
-                    },
                   ),
 
                   CategoryPieChart(

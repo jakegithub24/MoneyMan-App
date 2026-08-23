@@ -44,9 +44,6 @@ class MockExpenseRepository implements ExpenseRepository {
   Future<void> updateExpense(Expense expense) async {}
 
   @override
-  Future<Expense?> getExpenseById(String id) async => null;
-
-  @override
   Future<double> getMonthlyBudget() async => 0.0;
 
   @override

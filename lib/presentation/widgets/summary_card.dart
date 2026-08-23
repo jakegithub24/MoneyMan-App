@@ -11,7 +11,6 @@ import '../utils/currency_formatter.dart';
 class SummaryCard extends StatelessWidget {
   final ExpenseSummary summary;
   final DateFilterType filterType;
-  final VoidCallback? onSetBudgetTap;
   final VoidCallback? onIncomeTap;
   final VoidCallback? onExpenseTap;
   final VoidCallback? onActivityTap;
@@ -20,7 +19,6 @@ class SummaryCard extends StatelessWidget {
     super.key,
     required this.summary,
     required this.filterType,
-    this.onSetBudgetTap,
     this.onIncomeTap,
     this.onExpenseTap,
     this.onActivityTap,
@@ -377,18 +375,12 @@ class SummaryCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          InkWell(
-                            onTap: onSetBudgetTap != null ? () {
-                              AppHaptics.lightImpact();
-                              onSetBudgetTap!();
-                            } : null,
-                            child: Text(
-                              '${CurrencyFormatter.formatAmount(summary.monthlyExpense, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)} / ${CurrencyFormatter.formatAmount(summary.monthlyBudget, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)}',
-                              style: TextStyle(
-                                color: AppTheme.textColor.withValues(alpha: 0.8),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          Text(
+                            '${CurrencyFormatter.formatAmount(summary.monthlyExpense, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)} / ${CurrencyFormatter.formatAmount(summary.monthlyBudget, currencyCode: code, symbolOverride: symbol, decimalDigits: 0)}',
+                            style: TextStyle(
+                              color: AppTheme.textColor.withValues(alpha: 0.8),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
