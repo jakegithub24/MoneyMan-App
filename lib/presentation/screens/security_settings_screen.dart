@@ -276,7 +276,14 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   ),
                   const Divider(color: AppTheme.backgroundColor, height: 1),
                   ListTile(
-                    leading: const SizedBox(width: 40),
+                    leading: Container(
+                      width: 40,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.password_rounded,
+                        color: AppTheme.baseHighlightColor,
+                      ),
+                    ),
                     title: const Text(
                       'Change Security PIN',
                       style: TextStyle(color: AppTheme.baseHighlightColor, fontSize: 14),
