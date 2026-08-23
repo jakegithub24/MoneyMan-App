@@ -231,7 +231,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
       onPointerDown: (_) => _onUserActivity(),
       onPointerMove: (_) => _onUserActivity(),
       onPointerUp: (_) => _onUserActivity(),
-      child: Scaffold(
+      child: PopScope(
+        canPop: _currentIndex == 0,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          if (_currentIndex != 0) {
+            _onUserActivity();
+            AppHaptics.lightImpact();
+            setState(() {
+              _currentIndex = 0;
+            });
+          }
+        },
+        child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         body: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
@@ -301,6 +313,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
           child: const Icon(Icons.add_rounded, size: 28, color: AppTheme.backgroundColor),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
