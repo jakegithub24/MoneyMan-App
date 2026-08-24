@@ -19,7 +19,7 @@ class DashboardScreen extends StatelessWidget {
   final ExpenseRepository repository;
   final VoidCallback onSeeAllPressed;
   final Function(TransactionType? type)? onNavigateToTransactionsWithFilter;
-  final Function(String category)? onNavigateToTransactionsWithCategory;
+  final Function? onNavigateToTransactionsWithCategory;
 
   const DashboardScreen({
     super.key,
@@ -270,12 +270,19 @@ class DashboardScreen extends StatelessWidget {
                   ),
 
                   CategoryPieChart(
+                    summary: state.summary,
+                    allPeriodExpenses: state.allPeriodExpenses,
+                    filterType: state.filterType,
                     totalsByCategory: state.summary.totalsByCategory,
                     totalAmount: state.summary.totalExpense,
-                    onCategoryTap: (category) {
+                    onCategoryTap: (category, [type]) {
                       AppHaptics.lightImpact();
                       if (onNavigateToTransactionsWithCategory != null) {
-                        onNavigateToTransactionsWithCategory!(category);
+                        try {
+                          (onNavigateToTransactionsWithCategory as dynamic)(category, type);
+                        } catch (_) {
+                          (onNavigateToTransactionsWithCategory as dynamic)(category);
+                        }
                       } else {
                         onSeeAllPressed();
                       }

@@ -50,6 +50,7 @@ class DashboardCubit extends Cubit<DashboardState> {
       emit(DashboardLoaded(
         summary: summary,
         recentExpenses: recent.take(5).toList(),
+        allPeriodExpenses: recent,
         filterType: filterType,
       ));
     } catch (e) {
