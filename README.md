@@ -37,7 +37,9 @@
 ### 📊 Dashboard & Financial Overview
 - **Real-Time Summary**: Instant overview of Total Income, Total Expenses, and Net Balance for any selected timeframe (Today, This Week, This Month, This Year, All Time).
 - **Monthly Target Budgeting**: Live progress tracker calculating spending against monthly target budget with remaining balance and percentage indicators.
-- **Interactive Pie Chart**: Interactive spending breakdown powered by `fl_chart`. Tapping any pie chart slice or legend item immediately navigates to **Transactions** with that category pre-filtered.
+- **Interactive Pie & Line Breakdown**: 
+  - **Pie Mode**: Category breakdown for Income or Expenses with one-tap navigation to filtered Transactions.
+  - **Line Mode**: Multi-series line charts tracking income (green) and expenses (red) over 4-hour slots, daily, monthly, or 10-year intervals with scrollable set selectors.
 - **Quick Action Triggers**: Fast one-tap buttons for adding income or expenses directly from the dashboard.
 
 ### 📝 Transaction Management
