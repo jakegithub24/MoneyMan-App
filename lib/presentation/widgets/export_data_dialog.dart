@@ -104,7 +104,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppTheme.baseHighlightColor,
               onPrimary: AppTheme.backgroundColor,
               surface: AppTheme.cardBackgroundColor,
@@ -162,7 +162,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
     if (!hasPermission) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Storage permission is required to save CSV files.', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.expenseColor,
           ),
@@ -203,7 +203,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('CSV successfully saved to:\n$savedPath', style: const TextStyle(color: AppTheme.textColor)),
+            content: Text('CSV successfully saved to:\n$savedPath', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.cardBackgroundColor,
             duration: const Duration(seconds: 5),
           ),
@@ -213,7 +213,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Export Failed: ${e.toString()}', style: const TextStyle(color: AppTheme.textColor)),
+            content: Text('Export Failed: ${e.toString()}', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.expenseColor,
           ),
         );
@@ -230,7 +230,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
     await Clipboard.setData(ClipboardData(text: csvData));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('CSV data copied to clipboard'),
           backgroundColor: AppTheme.cardBackgroundColor,
         ),
@@ -253,7 +253,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.file_upload_rounded, color: AppTheme.baseHighlightColor, size: 28),
                     SizedBox(width: 10),
@@ -268,7 +268,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppTheme.textColor),
+                  icon: Icon(Icons.close_rounded, color: AppTheme.textColor),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -276,7 +276,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
             const SizedBox(height: 16),
 
             // 1. Data Type Filter Choice
-            const Text(
+            Text(
               'Select Data Type',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),
@@ -335,7 +335,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
             const SizedBox(height: 20),
 
             // 2. Period Filter Choice
-            const Text(
+            Text(
               'Select Period',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),
@@ -383,7 +383,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
             const SizedBox(height: 20),
 
             // Download Path Target Preview Card
-            const Text(
+            Text(
               'Selected Download Location',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),
@@ -403,7 +403,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Save Location',
                           style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold),
                         ),
@@ -427,14 +427,14 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
             const SizedBox(height: 16),
 
             // File Name Input
-            const Text(
+            Text(
               'File Name String (before .csv)',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _fileNamePrefixController,
-              style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'moneyman_export',
                 prefixIcon: const Icon(Icons.description_rounded, color: AppTheme.baseHighlightColor),
@@ -471,7 +471,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
               tilePadding: EdgeInsets.zero,
               collapsedIconColor: AppTheme.textColor,
               iconColor: AppTheme.baseHighlightColor,
-              title: const Text(
+              title: Text(
                 'Preview CSV Data',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 14, fontWeight: FontWeight.w600),
               ),
@@ -493,7 +493,7 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
                     child: SingleChildScrollView(
                       child: Text(
                         _previewCsv ?? 'Loading preview...',
-                        style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textColor),
+                        style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textColor),
                       ),
                     ),
                   ),
@@ -512,9 +512,9 @@ class _ExportDataDialogState extends State<ExportDataDialog> {
                   foregroundColor: AppTheme.backgroundColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                icon: const Icon(Icons.file_download_rounded, color: AppTheme.backgroundColor),
+                icon: Icon(Icons.file_download_rounded, color: AppTheme.backgroundColor),
                 label: _isExporting
-                    ? const CircularProgressIndicator(color: AppTheme.backgroundColor)
+                    ? CircularProgressIndicator(color: AppTheme.backgroundColor)
                     : const Text(
                         'Download CSV',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

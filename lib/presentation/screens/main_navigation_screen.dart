@@ -199,7 +199,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
   @override
   Widget build(BuildContext context) {
     if (!_isUnlocked) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         body: Center(
           child: CircularProgressIndicator(color: AppTheme.baseHighlightColor),
@@ -316,7 +316,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
               listCubit.loadExpenses();
             }
           },
-          child: const Icon(Icons.add_rounded, size: 28, color: AppTheme.backgroundColor),
+          child: Icon(Icons.add_rounded, size: 28, color: AppTheme.backgroundColor),
         ),
       ),
     ),

@@ -102,7 +102,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppTheme.baseHighlightColor,
               onPrimary: AppTheme.backgroundColor,
               surface: AppTheme.cardBackgroundColor,
@@ -121,7 +121,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         builder: (context, child) {
           return Theme(
             data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.dark(
+              colorScheme: ColorScheme.dark(
                 primary: AppTheme.baseHighlightColor,
                 onPrimary: AppTheme.backgroundColor,
                 surface: AppTheme.cardBackgroundColor,
@@ -165,7 +165,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       if (_selectedDate.isAfter(now)) {
         AppHaptics.heavyImpact();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Future transaction dates are not allowed. Please select current or past date.', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.expenseColor,
           ),
@@ -211,7 +211,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
             SnackBar(
               content: Text(
                 isEditing ? 'Record updated successfully' : 'Record added successfully',
-                style: const TextStyle(color: AppTheme.textColor),
+                style: TextStyle(color: AppTheme.textColor),
               ),
               backgroundColor: AppTheme.cardBackgroundColor,
             ),
@@ -220,7 +220,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         } else if (state is ExpenseFormError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message, style: const TextStyle(color: AppTheme.textColor)),
+              content: Text(state.message, style: TextStyle(color: AppTheme.textColor)),
               backgroundColor: AppTheme.expenseColor,
             ),
           );
@@ -234,7 +234,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
             isEditing
                 ? 'Edit ${_selectedType.displayName}'
                 : 'Add ${_selectedType.displayName}',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
           ),
           actions: [
             if (isEditing)
@@ -247,15 +247,15 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                     context: context,
                     builder: (ctx) => AlertDialog(
                       backgroundColor: AppTheme.cardBackgroundColor,
-                      title: const Text('Delete Transaction?', style: TextStyle(color: AppTheme.textColor)),
-                      content: const Text(
+                      title: Text('Delete Transaction?', style: TextStyle(color: AppTheme.textColor)),
+                      content: Text(
                         'Are you sure you want to remove this record?',
                         style: TextStyle(color: AppTheme.textColor),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx, false),
-                          child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+                          child: Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -382,7 +382,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                       children: [
                         Text(
                           'Amount ($symbol)',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppTheme.textColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -392,7 +392,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                         TextFormField(
                           controller: _amountController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.textColor,
@@ -433,7 +433,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Category',
                       style: TextStyle(
                         color: AppTheme.textColor,
@@ -542,7 +542,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 const SizedBox(height: 24),
 
                 // Date & Time Picker
-                const Text(
+                Text(
                   'Date & Time',
                   style: TextStyle(
                     color: AppTheme.textColor,
@@ -572,7 +572,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                             Text(
                               DateFormat('EEE, MMM d, yyyy  •  hh:mm a')
                                   .format(_selectedDate),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppTheme.textColor,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -580,7 +580,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                             ),
                           ],
                         ),
-                        const Icon(Icons.edit_rounded,
+                        Icon(Icons.edit_rounded,
                             color: AppTheme.textColor, size: 18),
                       ],
                     ),
@@ -601,7 +601,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Row(
+                          Row(
                             children: [
                               Icon(Icons.autorenew_rounded,
                                   color: AppTheme.popHighlightColor, size: 20),
@@ -628,11 +628,11 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                         ],
                       ),
                       if (_isRecurring) ...[
-                        const Divider(color: AppTheme.cardBackgroundColor, height: 20),
+                        Divider(color: AppTheme.cardBackgroundColor, height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Repeat Interval',
                               style: TextStyle(
                                 color: AppTheme.textColor,
@@ -670,7 +670,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 const SizedBox(height: 24),
 
                 // Optional Note Field
-                const Text(
+                Text(
                   'Note (Optional)',
                   style: TextStyle(
                     color: AppTheme.textColor,
@@ -681,8 +681,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _noteController,
-                  style: const TextStyle(color: AppTheme.textColor),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: AppTheme.textColor),
+                  decoration: InputDecoration(
                     hintText: 'Add a description or note...',
                     prefixIcon: Icon(Icons.notes_rounded, color: AppTheme.textColor),
                   ),
@@ -690,7 +690,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 const SizedBox(height: 20),
 
                 // Optional Merchant/Payee Field
-                const Text(
+                Text(
                   'Merchant / Payee (Optional)',
                   style: TextStyle(
                     color: AppTheme.textColor,
@@ -701,8 +701,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _merchantController,
-                  style: const TextStyle(color: AppTheme.textColor),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: AppTheme.textColor),
+                  decoration: InputDecoration(
                     hintText: 'e.g. Amazon, Starbucks, Landlord',
                     prefixIcon: Icon(Icons.store_rounded, color: AppTheme.textColor),
                   ),
@@ -710,7 +710,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 const SizedBox(height: 20),
 
                 // Payment Method Selector
-                const Text(
+                Text(
                   'Payment Method (Optional)',
                   style: TextStyle(
                     color: AppTheme.textColor,
@@ -722,15 +722,15 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 DropdownButtonFormField<String>(
                   initialValue: _selectedPaymentMethod,
                   dropdownColor: AppTheme.cardBackgroundColor,
-                  style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+                  decoration: InputDecoration(
                     prefixIcon: Icon(Icons.credit_card_rounded, color: AppTheme.textColor),
                     hintText: 'Select payment method',
                   ),
                   items: _paymentMethods.map((method) {
                     return DropdownMenuItem(
                       value: method,
-                      child: Text(method, style: const TextStyle(color: AppTheme.textColor)),
+                      child: Text(method, style: TextStyle(color: AppTheme.textColor)),
                     );
                   }).toList(),
                   onChanged: (val) {
@@ -759,7 +759,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                         ),
                         onPressed: isSubmitting ? null : _submit,
                         child: isSubmitting
-                            ? const CircularProgressIndicator(color: AppTheme.textColor)
+                            ? CircularProgressIndicator(color: AppTheme.textColor)
                             : Text(
                                 isEditing
                                     ? 'Update ${_selectedType.displayName}'

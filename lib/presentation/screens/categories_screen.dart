@@ -55,15 +55,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.cardBackgroundColor,
-        title: const Text('Delete Category?', style: TextStyle(color: AppTheme.textColor)),
+        title: Text('Delete Category?', style: TextStyle(color: AppTheme.textColor)),
         content: Text(
           'Are you sure you want to delete "${category.name}"?',
-          style: const TextStyle(color: AppTheme.textColor),
+          style: TextStyle(color: AppTheme.textColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+            child: Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.expenseColor, foregroundColor: AppTheme.textColor),
@@ -79,7 +79,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
       await categoryCubit.deleteCategory(category.id);
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Category "${category.name}" deleted', style: const TextStyle(color: AppTheme.textColor)),
+          content: Text('Category "${category.name}" deleted', style: TextStyle(color: AppTheme.textColor)),
           backgroundColor: AppTheme.expenseColor,
         ),
       );
@@ -92,7 +92,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundColor,
-        title: const Text(
+        title: Text(
           'Manage Categories',
           style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
         ),
@@ -141,7 +141,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
         backgroundColor: AppTheme.baseHighlightColor,
         foregroundColor: AppTheme.backgroundColor,
         onPressed: () => _openCreateCategoryDialog(context),
-        child: const Icon(Icons.add_rounded, color: AppTheme.backgroundColor, size: 28),
+        child: Icon(Icons.add_rounded, color: AppTheme.backgroundColor, size: 28),
       ),
     );
   }
@@ -156,11 +156,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.category_rounded, size: 48, color: AppTheme.textColor),
+            Icon(Icons.category_rounded, size: 48, color: AppTheme.textColor),
             const SizedBox(height: 12),
             Text(
               'No ${type.displayName.toLowerCase()} categories found',
-              style: const TextStyle(color: AppTheme.textColor, fontSize: 16),
+              style: TextStyle(color: AppTheme.textColor, fontSize: 16),
             ),
           ],
         ),
@@ -197,7 +197,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
             ),
             title: Text(
               cat.name,
-              style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
               cat.isCustom ? 'Custom Category' : 'System Default',

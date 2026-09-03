@@ -34,6 +34,7 @@ class ExpenseHiveDatasource {
       await sBox.put('currency_symbol', '₹');
       await sBox.put('security_lock_enabled', false);
       await sBox.put('auto_lock_interval_minutes', 1);
+      await sBox.put('appearance_mode', 'device');
       await sBox.put('onboarding_completed', false);
     }
   }
@@ -158,6 +159,20 @@ class ExpenseHiveDatasource {
     await sBox.put('drm_protection_enabled', enabled);
   }
 
+  Future<String> getAppearanceMode() async {
+    final sBox = await settingsBox;
+    final val = sBox.get('appearance_mode');
+    if (val == null || val is! String || val.trim().isEmpty) {
+      return 'device';
+    }
+    return val.trim();
+  }
+
+  Future<void> setAppearanceMode(String mode) async {
+    final sBox = await settingsBox;
+    await sBox.put('appearance_mode', mode);
+  }
+
   Future<String> getCurrencyCode() async {
     final sBox = await settingsBox;
     final val = sBox.get('currency_code');
@@ -220,6 +235,7 @@ class ExpenseHiveDatasource {
     await sBox.put('haptic_feedback_enabled', true);
     await sBox.put('drm_protection_enabled', false);
     await sBox.put('auto_lock_interval_minutes', 1);
+    await sBox.put('appearance_mode', 'device');
     await sBox.delete('last_active_timestamp');
     await sBox.put('onboarding_completed', false);
   }

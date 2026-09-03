@@ -107,14 +107,14 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
           'Warning: Data Overwrite',
           style: TextStyle(color: AppTheme.expenseColor, fontWeight: FontWeight.bold),
         ),
-        content: const Text(
+        content: Text(
           "All existing app data will be deleted. Export it if you don't want to loose it.",
           style: TextStyle(color: AppTheme.textColor, fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+            child: Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -147,7 +147,7 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Successfully loaded $count records from CSV', style: const TextStyle(color: AppTheme.textColor)),
+            content: Text('Successfully loaded $count records from CSV', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.cardBackgroundColor,
             duration: const Duration(seconds: 4),
           ),
@@ -180,7 +180,7 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.file_download_rounded, color: AppTheme.baseHighlightColor, size: 28),
                     SizedBox(width: 10),
@@ -195,14 +195,14 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppTheme.textColor),
+                  icon: Icon(Icons.close_rounded, color: AppTheme.textColor),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
-            const Text(
+            Text(
               'Select MoneyMan Exported .csv File',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),
@@ -224,7 +224,7 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Selected CSV File',
                           style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold),
                         ),
@@ -272,7 +272,7 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: const TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -286,7 +286,7 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
               tilePadding: EdgeInsets.zero,
               collapsedIconColor: AppTheme.textColor,
               iconColor: AppTheme.baseHighlightColor,
-              title: const Text(
+              title: Text(
                 'Or Paste Raw CSV Content',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
               ),
@@ -294,7 +294,7 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
                 TextField(
                   controller: _rawCsvController,
                   maxLines: 5,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textColor),
+                  style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textColor),
                   decoration: const InputDecoration(
                     hintText: 'Paste CSV rows here...',
                   ),
@@ -313,9 +313,9 @@ class _ImportDataDialogState extends State<ImportDataDialog> {
                   foregroundColor: AppTheme.backgroundColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                icon: const Icon(Icons.download_rounded, color: AppTheme.backgroundColor),
+                icon: Icon(Icons.download_rounded, color: AppTheme.backgroundColor),
                 label: _isImporting
-                    ? const CircularProgressIndicator(color: AppTheme.backgroundColor)
+                    ? CircularProgressIndicator(color: AppTheme.backgroundColor)
                     : const Text(
                         'Import & Load Data',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

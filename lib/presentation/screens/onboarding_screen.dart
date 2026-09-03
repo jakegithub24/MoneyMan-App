@@ -67,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Could not open link. Please visit: $githubUrl', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.cardBackgroundColor,
           ),
@@ -236,7 +236,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 24),
 
-          const Text(
+          Text(
             'Welcome to MoneyMan',
             style: TextStyle(
               color: AppTheme.textColor,
@@ -357,7 +357,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  const Text(
+                  Text(
                     'Profile & Currency Setup',
                     style: TextStyle(
                       color: AppTheme.textColor,
@@ -376,7 +376,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 24),
 
                   // Username Section
-                  const Text(
+                  Text(
                     'USERNAME',
                     style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                   ),
@@ -385,7 +385,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     controller: _nameController,
                     maxLength: 10,
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]'))],
-                    style: const TextStyle(color: AppTheme.textColor, fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppTheme.textColor, fontSize: 16, fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
                       hintText: 'Username (A-Z, a-z, 0-9, _, max 10 chars)',
                       prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
@@ -417,7 +417,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 16),
 
                   // Currency Selector Section
-                  const Text(
+                  Text(
                     'ACCOUNT CURRENCY (FIXED)',
                     style: TextStyle(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                   ),
@@ -435,13 +435,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       title: Text(
                         '${_selectedCurrency.name} (${_selectedCurrency.symbol})',
-                        style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 15),
+                        style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                       subtitle: Text(
                         'Code: ${_selectedCurrency.code}',
                         style: TextStyle(color: AppTheme.textColor.withValues(alpha: 0.7), fontSize: 12),
                       ),
-                      trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textColor),
+                      trailing: Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textColor),
                       onTap: _openCurrencyPicker,
                     ),
                   ),
@@ -513,7 +513,7 @@ class _FeatureRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w500),
           ),
         ),
       ],

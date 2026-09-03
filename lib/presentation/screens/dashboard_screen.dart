@@ -55,7 +55,7 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -79,7 +79,7 @@ class DashboardScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.lock_outline_rounded, color: AppTheme.textColor),
+            icon: Icon(Icons.lock_outline_rounded, color: AppTheme.textColor),
             tooltip: 'Lock App',
             onPressed: () async {
               AppHaptics.heavyImpact();
@@ -101,7 +101,7 @@ class DashboardScreen extends StatelessWidget {
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('App lock is disabled. Enable PIN lock in Settings.', style: TextStyle(color: AppTheme.textColor)),
                     backgroundColor: AppTheme.cardBackgroundColor,
                   ),
@@ -110,7 +110,7 @@ class DashboardScreen extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings_rounded, color: AppTheme.textColor),
+            icon: Icon(Icons.settings_rounded, color: AppTheme.textColor),
             tooltip: 'Settings & Tools',
             onPressed: () async {
               AppHaptics.lightImpact();
@@ -151,7 +151,7 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       state.message,
-                      style: const TextStyle(color: AppTheme.textColor),
+                      style: TextStyle(color: AppTheme.textColor),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
@@ -198,7 +198,7 @@ class DashboardScreen extends StatelessWidget {
                                 : 'User';
                             return Row(
                               children: [
-                                const Text(
+                                Text(
                                   'Hello, ',
                                   style: TextStyle(
                                     fontSize: 24,
@@ -368,7 +368,7 @@ class DashboardScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Recent Activity',
                           style: TextStyle(
                             color: AppTheme.textColor,
@@ -408,7 +408,7 @@ class DashboardScreen extends StatelessWidget {
                         color: AppTheme.cardBackgroundColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Column(
+                      child: Column(
                         children: [
                           Icon(
                             Icons.receipt_long_rounded,

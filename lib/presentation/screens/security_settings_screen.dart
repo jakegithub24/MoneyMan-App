@@ -96,7 +96,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.cardBackgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Auto-Lock Interval', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
+        title: Text('Auto-Lock Interval', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: intervals.map((item) {
@@ -126,7 +126,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Auto-lock interval set to ${_getAutoLockIntervalLabel(selected)}', style: const TextStyle(color: AppTheme.textColor)),
+            content: Text('Auto-lock interval set to ${_getAutoLockIntervalLabel(selected)}', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.cardBackgroundColor,
           ),
         );
@@ -208,7 +208,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
       widget.onSettingsUpdated();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
               'DRM protection enabled (screenshots & screen recording blocked)',
               style: TextStyle(color: AppTheme.textColor),
@@ -251,7 +251,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
       widget.onSettingsUpdated();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
               'DRM protection disabled',
               style: TextStyle(color: AppTheme.textColor),
@@ -284,7 +284,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundColor,
-        title: const Text(
+        title: Text(
           'Security & Privacy',
           style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
         ),
@@ -307,11 +307,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                     child: const Icon(Icons.lock_outline_rounded,
                         color: AppTheme.incomeColor),
                   ),
-                  title: const Text(
+                  title: Text(
                     'App Security PIN Lock',
                     style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
                   ),
-                  subtitle: const Text(
+                  subtitle: Text(
                     'Require 4-digit PIN to access app',
                     style: TextStyle(color: AppTheme.textColor, fontSize: 12),
                   ),
@@ -320,7 +320,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   onChanged: _toggleSecurityLock,
                 ),
                 if (_isLockEnabled && _savedPin != null) ...[
-                  const Divider(color: AppTheme.backgroundColor, height: 1),
+                  Divider(color: AppTheme.backgroundColor, height: 1),
                   SwitchListTile(
                     secondary: Container(
                       padding: const EdgeInsets.all(10),
@@ -331,11 +331,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       child: const Icon(Icons.fingerprint_rounded,
                           color: AppTheme.incomeColor),
                     ),
-                    title: const Text(
+                    title: Text(
                       'Biometric / Fingerprint Unlock',
                       style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
                     ),
-                    subtitle: const Text(
+                    subtitle: Text(
                       'Use fingerprint verification alongside 4-digit PIN',
                       style: TextStyle(color: AppTheme.textColor, fontSize: 12),
                     ),
@@ -343,7 +343,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                     activeThumbColor: AppTheme.baseHighlightColor,
                     onChanged: _toggleBiometricLock,
                   ),
-                  const Divider(color: AppTheme.backgroundColor, height: 1),
+                  Divider(color: AppTheme.backgroundColor, height: 1),
                   ListTile(
                     leading: Container(
                       width: 40,
@@ -357,7 +357,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       'Change Security PIN',
                       style: TextStyle(color: AppTheme.baseHighlightColor, fontSize: 14),
                     ),
-                    trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                    trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
                     onTap: () async {
                       final currentPin = await widget.repository.getSecurityPin();
                       if (!context.mounted) return;
@@ -388,7 +388,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                         widget.onSettingsUpdated();
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text('PIN updated successfully', style: TextStyle(color: AppTheme.textColor)),
                               backgroundColor: AppTheme.cardBackgroundColor,
                             ),
@@ -397,7 +397,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       }
                     },
                   ),
-                  const Divider(color: AppTheme.backgroundColor, height: 1),
+                  Divider(color: AppTheme.backgroundColor, height: 1),
                   ListTile(
                     leading: Container(
                       padding: const EdgeInsets.all(10),
@@ -410,15 +410,15 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                         color: AppTheme.incomeColor,
                       ),
                     ),
-                    title: const Text(
+                    title: Text(
                       'Auto-Lock Interval',
                       style: TextStyle(color: AppTheme.textColor, fontSize: 14, fontWeight: FontWeight.w600),
                     ),
                     subtitle: Text(
                       'Lock after inactivity: ${_getAutoLockIntervalLabel(_autoLockIntervalMinutes)}',
-                      style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
+                      style: TextStyle(color: AppTheme.textColor, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                    trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
                     onTap: _showAutoLockIntervalDialog,
                   ),
                 ],
@@ -441,11 +441,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   color: AppTheme.incomeColor,
                 ),
               ),
-              title: const Text(
+              title: Text(
                 'DRM Protection',
                 style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Block screenshots & screen recordings across app',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),

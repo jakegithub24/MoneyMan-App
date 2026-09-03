@@ -47,7 +47,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppTheme.baseHighlightColor,
               onPrimary: AppTheme.backgroundColor,
               surface: AppTheme.cardBackgroundColor,
@@ -84,7 +84,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundColor,
-        title: const Text(
+        title: Text(
           'Transactions',
           style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
         ),
@@ -157,13 +157,13 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                   onChanged: (val) {
                     context.read<ExpenseListCubit>().setSearchQuery(val);
                   },
-                  style: const TextStyle(color: AppTheme.textColor),
+                  style: TextStyle(color: AppTheme.textColor),
                   decoration: InputDecoration(
                     hintText: 'Search note, merchant, category, amount...',
-                    prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.textColor),
+                    prefixIcon: Icon(Icons.search_rounded, color: AppTheme.textColor),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, color: AppTheme.textColor),
+                            icon: Icon(Icons.clear_rounded, color: AppTheme.textColor),
                             onPressed: () {
                               _searchController.clear();
                               context.read<ExpenseListCubit>().setSearchQuery('');
@@ -289,13 +289,13 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.search_off_rounded,
                               size: 56,
                               color: AppTheme.textColor,
                             ),
                             const SizedBox(height: 12),
-                            const Text(
+                            Text(
                               'No transactions found',
                               style: TextStyle(
                                 color: AppTheme.textColor,
@@ -304,7 +304,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
+                            Text(
                               'Try adjusting your search query or filters',
                               style: TextStyle(color: AppTheme.textColor, fontSize: 14),
                               textAlign: TextAlign.center,
@@ -354,7 +354,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                               color: AppTheme.expenseColor,
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.delete_outline_rounded,
                               color: AppTheme.textColor,
                               size: 28,
@@ -365,15 +365,15 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                               context: context,
                               builder: (ctx) => AlertDialog(
                                 backgroundColor: AppTheme.cardBackgroundColor,
-                                title: const Text('Delete Record?', style: TextStyle(color: AppTheme.textColor)),
-                                content: const Text(
+                                title: Text('Delete Record?', style: TextStyle(color: AppTheme.textColor)),
+                                content: Text(
                                   'Are you sure you want to remove this transaction?',
                                   style: TextStyle(color: AppTheme.textColor),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(ctx, false),
-                                    child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+                                    child: Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
                                   ),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
@@ -402,7 +402,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
 
                             messenger.showSnackBar(
                               SnackBar(
-                                content: Text('${deletedExpense.category} record deleted', style: const TextStyle(color: AppTheme.textColor)),
+                                content: Text('${deletedExpense.category} record deleted', style: TextStyle(color: AppTheme.textColor)),
                                 backgroundColor: AppTheme.cardBackgroundColor,
                                 duration: const Duration(seconds: 4),
                                 action: SnackBarAction(

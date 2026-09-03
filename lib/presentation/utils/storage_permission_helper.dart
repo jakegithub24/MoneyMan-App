@@ -58,7 +58,7 @@ class StoragePermissionHelper {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -137,7 +137,7 @@ class StoragePermissionHelper {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -157,7 +157,7 @@ class StoragePermissionHelper {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
+            child: Text(
               'Cancel',
               style: TextStyle(color: AppTheme.textColor),
             ),

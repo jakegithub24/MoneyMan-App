@@ -53,7 +53,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
     AppTheme.popHighlightColor,
     AppTheme.incomeColor,
     AppTheme.expenseColor,
-    AppTheme.textColor,
+    AppTheme.subtleWhite,
   ];
 
   CategoryItem _getCategoryInfo(String categoryName) {
@@ -130,7 +130,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppTheme.textColor,
               fontSize: 17,
               fontWeight: FontWeight.bold,
@@ -492,7 +492,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
                   Expanded(
                     child: Text(
                       catInfo.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppTheme.textColor,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

@@ -53,7 +53,7 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.currency_exchange_rounded, color: AppTheme.baseHighlightColor, size: 28),
                     SizedBox(width: 10),
@@ -68,7 +68,7 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppTheme.textColor),
+                  icon: Icon(Icons.close_rounded, color: AppTheme.textColor),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -78,9 +78,9 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
             // Search Bar
             TextField(
               controller: _searchController,
-              style: const TextStyle(color: AppTheme.textColor),
+              style: TextStyle(color: AppTheme.textColor),
               onChanged: (val) => setState(() => _filter = val.trim().toLowerCase()),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Search INR, USD, Euro, Yen...',
                 prefixIcon: Icon(Icons.search_rounded, color: AppTheme.textColor),
               ),
@@ -99,7 +99,7 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
                   }).toList();
 
                   if (filtered.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Text(
                         'No currencies found',
                         style: TextStyle(color: AppTheme.textColor),
@@ -152,7 +152,7 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
                             children: [
                               Text(
                                 item.code,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppTheme.textColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -167,7 +167,7 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
                                 ),
                                 child: Text(
                                   item.symbol,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppTheme.textColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -178,7 +178,7 @@ class _CurrencySelectorDialogState extends State<CurrencySelectorDialog> {
                           ),
                           subtitle: Text(
                             item.name,
-                            style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
+                            style: TextStyle(color: AppTheme.textColor, fontSize: 12),
                           ),
                           trailing: isSelected
                               ? const Icon(Icons.check_circle_rounded, color: AppTheme.baseHighlightColor, size: 22)

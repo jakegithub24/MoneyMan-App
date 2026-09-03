@@ -140,6 +140,12 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<void> setDrmProtectionEnabled(bool enabled) => datasource.setDrmProtectionEnabled(enabled);
 
   @override
+  Future<String> getAppearanceMode() => datasource.getAppearanceMode();
+
+  @override
+  Future<void> setAppearanceMode(String mode) => datasource.setAppearanceMode(mode);
+
+  @override
   Future<String> getCurrencyCode() => datasource.getCurrencyCode();
 
   @override
