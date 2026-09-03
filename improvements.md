@@ -19,3 +19,6 @@
 - In 'Spending Breakdown' on Dashboard, there must be toggle for ('Pie', 'Line') graphs~~ (Resolved: Added Pie/Line graph toggle in breakdown card. Pie chart includes Expense/Income segmented switch. Line chart shows green line/dots for Income and red line/dots for Expense with interactive tooltips and 10-year interval set buttons for All Time view)
     - Pie chart: Keep as it is, but add 'Income - Expense' switch so that user can see pie chart of income and expense.
     - Line chart: Line chart will have green line and dots for income, red line and dots for expense. If 'All Time' filter is selected on Dashboard, 'Income/Spending Breakdown' screen will display set of 10 years followed by scrollable set number buttons.
+
+
+- Prompt a push notification for each reccuring payment (if paid or not, if not - postpone push notification till confirmed)

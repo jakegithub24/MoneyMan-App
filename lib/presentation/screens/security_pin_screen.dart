@@ -216,7 +216,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
               const SizedBox(height: 16),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textColor,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -319,7 +319,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
                                   width: 72,
                                   height: 72,
                                   alignment: Alignment.center,
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.backspace_rounded,
                                     color: AppTheme.textColor,
                                     size: 26,
@@ -344,7 +344,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
                                 alignment: Alignment.center,
                                 child: Text(
                                   key,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppTheme.textColor,
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,

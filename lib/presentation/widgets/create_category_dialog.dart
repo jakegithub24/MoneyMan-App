@@ -56,7 +56,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
     AppTheme.popHighlightColor,
     AppTheme.incomeColor,
     AppTheme.expenseColor,
-    AppTheme.textColor,
+    AppTheme.subtleWhite,
   ];
 
   @override
@@ -113,7 +113,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Create Category',
                   style: TextStyle(
                     color: AppTheme.textColor,
@@ -122,7 +122,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppTheme.textColor),
+                  icon: Icon(Icons.close_rounded, color: AppTheme.textColor),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -162,14 +162,14 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
             const SizedBox(height: 20),
 
             // Category Name Input
-            const Text(
+            Text(
               'Category Name',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _nameController,
-              style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 hintText: 'e.g., Subscriptions, Coffee, Gym',
                 prefixIcon: Icon(
@@ -181,7 +181,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
             const SizedBox(height: 20),
 
             // Color Selector
-            const Text(
+            Text(
               'Select Color',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),
@@ -205,7 +205,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
                       ),
                     ),
                     child: isSelected
-                        ? const Icon(Icons.check_rounded, color: AppTheme.backgroundColor, size: 18)
+                        ? Icon(Icons.check_rounded, color: AppTheme.backgroundColor, size: 18)
                         : null,
                   ),
                 );
@@ -214,7 +214,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
             const SizedBox(height: 20),
 
             // Icon Selector Grid
-            const Text(
+            Text(
               'Select Icon',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13, fontWeight: FontWeight.w600),
             ),

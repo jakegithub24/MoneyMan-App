@@ -298,7 +298,7 @@ class SummaryCard extends StatelessWidget {
                                     padding: const EdgeInsets.only(left: 6.0),
                                     child: Text(
                                       '${summary.totalCount} records',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: AppTheme.textColor,
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,

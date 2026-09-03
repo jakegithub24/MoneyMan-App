@@ -17,6 +17,7 @@ import 'presentation/state/currency/currency_cubit.dart';
 import 'presentation/state/dashboard/dashboard_cubit.dart';
 import 'presentation/state/expense_form/expense_form_cubit.dart';
 import 'presentation/state/expense_list/expense_list_cubit.dart';
+import 'presentation/state/theme/theme_cubit.dart';
 import 'presentation/theme/app_theme.dart';
 import 'presentation/utils/activity_tracker.dart';
 import 'presentation/utils/app_haptics.dart';
@@ -80,6 +81,9 @@ class ExpenseTrackerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<ThemeCubit>(
+          create: (_) => ThemeCubit(repository)..loadTheme(),
+        ),
         BlocProvider<CurrencyCubit>(
           create: (_) => CurrencyCubit(repository)..loadCurrency(),
         ),
@@ -108,23 +112,29 @@ class ExpenseTrackerApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(
-        title: 'MoneyMan',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.darkTheme,
-        builder: (context, child) {
-          return Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: (_) => ActivityTracker.recordActivity(),
-            onPointerMove: (_) => ActivityTracker.recordActivity(),
-            onPointerUp: (_) => ActivityTracker.recordActivity(),
-            onPointerHover: (_) => ActivityTracker.recordActivity(),
-            child: child!,
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp(
+            title: 'MoneyMan',
+            debugShowCheckedModeBanner: false,
+            themeMode: themeMode,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            builder: (context, child) {
+              return Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerDown: (_) => ActivityTracker.recordActivity(),
+                onPointerMove: (_) => ActivityTracker.recordActivity(),
+                onPointerUp: (_) => ActivityTracker.recordActivity(),
+                onPointerHover: (_) => ActivityTracker.recordActivity(),
+                child: child!,
+              );
+            },
+            home: MainNavigationScreen(
+              repository: repository,
+            ),
           );
         },
-        home: MainNavigationScreen(
-          repository: repository,
-        ),
       ),
     );
   }

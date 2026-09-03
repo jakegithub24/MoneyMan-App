@@ -102,7 +102,7 @@ class ExpenseTile extends StatelessWidget {
                                     expense.note != null && expense.note!.isNotEmpty
                                         ? expense.note!
                                         : expense.category,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppTheme.textColor,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -168,7 +168,7 @@ class ExpenseTile extends StatelessWidget {
                                     ),
                                     child: Text(
                                       expense.paymentMethod!,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: AppTheme.textColor,
                                         fontSize: 11,
                                         fontWeight: FontWeight.w500,

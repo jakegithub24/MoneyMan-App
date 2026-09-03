@@ -97,6 +97,13 @@ class MockBreakdownExpenseRepository implements ExpenseRepository {
     String fileName, {
     String? targetDirectoryPath,
   }) async => '/tmp/$fileName';
+  
+  String _appearanceMode = 'device';
+  @override
+  Future<String> getAppearanceMode() async => _appearanceMode;
+  @override
+  Future<void> setAppearanceMode(String mode) async => _appearanceMode = mode;
+
   @override
   Future<void> resetDatabase() async {}
 }

@@ -258,6 +258,13 @@ class InMemoryExpenseRepository implements ExpenseRepository {
     return imported;
   }
 
+  
+  String _appearanceMode = 'device';
+  @override
+  Future<String> getAppearanceMode() async => _appearanceMode;
+  @override
+  Future<void> setAppearanceMode(String mode) async => _appearanceMode = mode;
+
   @override
   Future<void> resetDatabase() async {
     _expenses.clear();

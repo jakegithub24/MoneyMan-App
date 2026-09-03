@@ -145,7 +145,7 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.description_rounded, color: AppTheme.baseHighlightColor, size: 28),
                     SizedBox(width: 10),
@@ -156,7 +156,7 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppTheme.textColor),
+                  icon: Icon(Icons.close_rounded, color: AppTheme.textColor),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -188,7 +188,7 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
                       scrollDirection: Axis.horizontal,
                       child: Text(
                         _currentDir.path,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.textColor,
                           fontSize: 12,
                           fontFamily: 'monospace',
@@ -235,7 +235,7 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
                           ),
                         )
                       : (_subDirectories.isEmpty && _csvFiles.isEmpty)
-                          ? const Center(
+                          ? Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -265,9 +265,9 @@ class _CsvFilePickerDialogState extends State<CsvFilePickerDialog> {
                                       leading: const Icon(Icons.folder_rounded, color: AppTheme.popHighlightColor, size: 22),
                                       title: Text(
                                         folderName,
-                                        style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600, fontSize: 13),
+                                        style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600, fontSize: 13),
                                       ),
-                                      trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor, size: 18),
+                                      trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor, size: 18),
                                       onTap: () => _navigateToDir(subDir as Directory),
                                     ),
                                   );

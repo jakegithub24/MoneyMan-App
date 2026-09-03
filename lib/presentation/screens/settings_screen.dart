@@ -7,6 +7,7 @@ import '../state/currency/currency_cubit.dart';
 import '../state/currency/currency_state.dart';
 import '../state/dashboard/dashboard_cubit.dart';
 import '../state/expense_list/expense_list_cubit.dart';
+import '../state/theme/theme_cubit.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_haptics.dart';
 import '../utils/currency_formatter.dart';
@@ -39,6 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isLockEnabled = false;
   bool _isBiometricEnabled = true;
   bool _isHapticEnabled = true;
+  String _appearanceMode = 'device';
 
   @override
   void initState() {
@@ -52,6 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lockEnabled = await widget.repository.isSecurityLockEnabled();
     final biometricEnabled = await widget.repository.isBiometricLockEnabled();
     final hapticEnabled = await widget.repository.isHapticFeedbackEnabled();
+    final appearance = await widget.repository.getAppearanceMode();
     AppHaptics.isEnabled = hapticEnabled;
     setState(() {
       _currentUsername = (username != null && username.trim().isNotEmpty) ? username.trim() : 'User';
@@ -59,6 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _isLockEnabled = lockEnabled;
       _isBiometricEnabled = biometricEnabled;
       _isHapticEnabled = hapticEnabled;
+      _appearanceMode = appearance;
     });
   }
 
@@ -71,6 +75,163 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _loadSettings();
   }
 
+  String _getAppearanceLabel(String mode) {
+    switch (mode.toLowerCase()) {
+      case 'light':
+        return 'Light';
+      case 'dark':
+        return 'Dark';
+      case 'device':
+      default:
+        return 'Device';
+    }
+  }
+
+  Future<void> _selectAppearanceDialog() async {
+    final themeCubit = context.read<ThemeCubit>();
+    final currentMode = ThemeCubit.parseThemeMode(_appearanceMode);
+
+    final selected = await showDialog<ThemeMode>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.palette_rounded, color: AppTheme.baseHighlightColor, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Appearance',
+              style: TextStyle(
+                color: AppTheme.textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildAppearanceOption(
+              ctx,
+              mode: ThemeMode.system,
+              title: 'Device',
+              subtitle: 'Match device system setting',
+              icon: Icons.phone_android_rounded,
+              isSelected: currentMode == ThemeMode.system,
+            ),
+            const SizedBox(height: 8),
+            _buildAppearanceOption(
+              ctx,
+              mode: ThemeMode.light,
+              title: 'Light',
+              subtitle: 'Clean light theme',
+              icon: Icons.light_mode_rounded,
+              isSelected: currentMode == ThemeMode.light,
+            ),
+            const SizedBox(height: 8),
+            _buildAppearanceOption(
+              ctx,
+              mode: ThemeMode.dark,
+              title: 'Dark',
+              subtitle: 'Classic dark vault theme',
+              icon: Icons.dark_mode_rounded,
+              isSelected: currentMode == ThemeMode.dark,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Close', style: TextStyle(color: AppTheme.textColor)),
+          ),
+        ],
+      ),
+    );
+
+    if (selected != null) {
+      AppHaptics.selectionClick();
+      await themeCubit.setThemeMode(selected);
+      await _loadSettings();
+      widget.onSettingsUpdated();
+    }
+  }
+
+  Widget _buildAppearanceOption(
+    BuildContext dialogCtx, {
+    required ThemeMode mode,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool isSelected,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => Navigator.pop(dialogCtx, mode),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppTheme.baseHighlightColor.withValues(alpha: 0.15)
+                : AppTheme.backgroundColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? AppTheme.baseHighlightColor
+                  : AppTheme.textColor.withValues(alpha: 0.15),
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? AppTheme.baseHighlightColor : AppTheme.textColor,
+                size: 24,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: isSelected ? AppTheme.baseHighlightColor : AppTheme.textColor,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: AppTheme.textColor.withValues(alpha: 0.7),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isSelected)
+                const Icon(Icons.check_circle_rounded, color: AppTheme.baseHighlightColor, size: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _updateUsernameDialog() async {
     final controller = TextEditingController(text: _currentUsername);
     String? errorText;
@@ -81,12 +242,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: AppTheme.cardBackgroundColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text('Update Username', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
+          title: Text('Update Username', style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Enter username (A-Z, a-z, 0-9, _, max 10 chars):',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 13),
               ),
@@ -95,7 +256,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: controller,
                 maxLength: 10,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]'))],
-                style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
                   hintText: 'e.g. Alex_99',
@@ -107,7 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+              child: Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -157,7 +318,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Username updated to "$result"', style: const TextStyle(color: AppTheme.textColor)),
+            content: Text('Username updated to "$result"', style: TextStyle(color: AppTheme.textColor)),
             backgroundColor: AppTheme.cardBackgroundColor,
           ),
         );
@@ -172,12 +333,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.cardBackgroundColor,
-        title: const Text('Set Monthly Budget', style: TextStyle(color: AppTheme.textColor)),
+        title: Text('Set Monthly Budget', style: TextStyle(color: AppTheme.textColor)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Enter your target monthly spending limit:',
               style: TextStyle(color: AppTheme.textColor, fontSize: 13),
             ),
@@ -185,7 +346,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextField(
               controller: controller,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: const TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 prefixIcon: Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -206,7 +367,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+            child: Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -238,7 +399,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundColor,
-        title: const Text(
+        title: Text(
           'Settings & Tools',
           style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textColor),
         ),
@@ -259,15 +420,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: const Icon(Icons.person_outline_rounded, color: AppTheme.baseHighlightColor),
               ),
-              title: const Text(
+              title: Text(
                 'Update Username',
                 style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
               ),
               subtitle: Text(
                 'Current: $_currentUsername',
-                style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
+                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
-              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
               onTap: _updateUsernameDialog,
             ),
           ),
@@ -286,17 +447,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    child: const Icon(Icons.palette_rounded, color: AppTheme.baseHighlightColor),
+                  ),
+                  title: Text(
+                    'Appearance',
+                    style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    'Theme: ${_getAppearanceLabel(_appearanceMode)}',
+                    style: TextStyle(color: AppTheme.textColor, fontSize: 12),
+                  ),
+                  trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                  onTap: () {
+                    AppHaptics.lightImpact();
+                    _selectAppearanceDialog();
+                  },
+                ),
+                Divider(color: AppTheme.backgroundColor, height: 1),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.baseHighlightColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: const Icon(Icons.category_rounded, color: AppTheme.baseHighlightColor),
                   ),
-                  title: const Text(
+                  title: Text(
                     'Manage Categories',
                     style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
                   ),
-                  subtitle: const Text(
+                  subtitle: Text(
                     'Create or delete income and expense categories',
                     style: TextStyle(color: AppTheme.textColor, fontSize: 12),
                   ),
-                  trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                  trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
                   onTap: () {
                     AppHaptics.lightImpact();
                     Navigator.push(
@@ -305,7 +490,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 ),
-                const Divider(color: AppTheme.backgroundColor, height: 1),
+                Divider(color: AppTheme.backgroundColor, height: 1),
                 SwitchListTile(
                   secondary: Container(
                     padding: const EdgeInsets.all(10),
@@ -315,11 +500,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     child: const Icon(Icons.vibration_rounded, color: AppTheme.popHighlightColor),
                   ),
-                  title: const Text(
+                  title: Text(
                     'Haptic Feedback',
                     style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
                   ),
-                  subtitle: const Text(
+                  subtitle: Text(
                     'Vibrate on button taps, keypad entry, & actions',
                     style: TextStyle(color: AppTheme.textColor, fontSize: 12),
                   ),
@@ -349,15 +534,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: const Icon(Icons.account_balance_wallet_rounded,
                         color: AppTheme.incomeColor),
                   ),
-                  title: const Text(
+                  title: Text(
                     'Monthly Target Budget',
                     style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
                   ),
                   subtitle: Text(
                     'Current: ${CurrencyFormatter.formatAmount(_currentBudget, currencyCode: currState.currency.code, symbolOverride: symbol)}',
-                    style: const TextStyle(color: AppTheme.textColor),
+                    style: TextStyle(color: AppTheme.textColor),
                   ),
-                  trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+                  trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
                   onTap: () {
                     AppHaptics.lightImpact();
                     _setBudgetDialog();
@@ -381,7 +566,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: const Icon(Icons.shield_rounded, color: AppTheme.incomeColor),
               ),
-              title: const Text(
+              title: Text(
                 'Security & Privacy',
                 style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
               ),
@@ -389,9 +574,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _isLockEnabled
                     ? 'PIN Lock: Enabled • ${_isBiometricEnabled ? "Biometrics: On" : "Biometrics: Off"}'
                     : 'PIN Lock: Disabled',
-                style: const TextStyle(color: AppTheme.textColor, fontSize: 12),
+                style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
-              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
               onTap: () async {
                 AppHaptics.lightImpact();
                 await Navigator.push(
@@ -426,15 +611,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: const Icon(Icons.file_upload_rounded, color: AppTheme.popHighlightColor),
               ),
-              title: const Text(
+              title: Text(
                 'Export CSV Data',
                 style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Export Income, Expenses, or Both for Day, Week, Year',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
-              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
               onTap: () async {
                 AppHaptics.lightImpact();
                 final granted = await StoragePermissionHelper.requestStoragePermission(
@@ -444,7 +629,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (!granted) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
                           'Storage permission is required to export CSV data.',
                           style: TextStyle(color: AppTheme.textColor),
@@ -475,15 +660,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: const Icon(Icons.file_download_rounded, color: AppTheme.baseHighlightColor),
               ),
-              title: const Text(
+              title: Text(
                 'Import CSV Data',
                 style: TextStyle(color: AppTheme.textColor, fontWeight: FontWeight.w600),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Import MoneyMan generated .csv file to restore transactions',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
-              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
+              trailing: Icon(Icons.chevron_right_rounded, color: AppTheme.textColor),
               onTap: () async {
                 AppHaptics.lightImpact();
                 final granted = await StoragePermissionHelper.requestStoragePermission(
@@ -493,7 +678,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (!granted) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
                           'Storage permission is required to import CSV data.',
                           style: TextStyle(color: AppTheme.textColor),
@@ -529,7 +714,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 'Reset Database & Start Fresh',
                 style: TextStyle(color: AppTheme.expenseColor, fontWeight: FontWeight.bold),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Wipe all app data, custom categories, and start from scratch',
                 style: TextStyle(color: AppTheme.textColor, fontSize: 12),
               ),
@@ -543,14 +728,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       'Reset Database?',
                       style: TextStyle(color: AppTheme.expenseColor, fontWeight: FontWeight.bold),
                     ),
-                    content: const Text(
+                    content: Text(
                       'Are you sure you want to reset all app database and start from scratch? All transaction history and settings will be wiped.',
                       style: TextStyle(color: AppTheme.textColor, fontSize: 14),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
+                        child: Text('Cancel', style: TextStyle(color: AppTheme.textColor)),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(

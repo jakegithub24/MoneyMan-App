@@ -43,6 +43,8 @@ abstract class ExpenseRepository {
   Future<void> setHapticFeedbackEnabled(bool enabled);
   Future<bool> isDrmProtectionEnabled();
   Future<void> setDrmProtectionEnabled(bool enabled);
+  Future<String> getAppearanceMode();
+  Future<void> setAppearanceMode(String mode);
 
   // Currency Management
   Future<String> getCurrencyCode();
