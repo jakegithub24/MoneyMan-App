@@ -24,7 +24,7 @@ class AppTheme {
   static const Color expenseColor = Color(0xFFD62B2B); // #d62b2b Expense
   static const Color baseHighlightColor = Color(0xFFE7C14D); // #e7c14d Base Highlight
   static const Color popHighlightColor = Color(0xFFE67E22); // #E67E22 Pop Highlight
-  static const Color subtleWhite = Color(0xFFEEE9D9); // #eee9d9 Subtle White (not #fff)
+  static const Color subtleWhite = Color(0xFFDDF2C9); // #DDF2C9 Subtle White
 
   // Dynamic Theme Mode State
   static ThemeMode currentThemeMode = ThemeMode.system;

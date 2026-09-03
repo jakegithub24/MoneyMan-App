@@ -161,7 +161,7 @@ void main() {
       expect(AppTheme.lightTextColor, const Color(0xFF131313));
 
       // Subtle white constant
-      expect(AppTheme.subtleWhite, const Color(0xFFEEE9D9));
+      expect(AppTheme.subtleWhite, const Color(0xFFDDF2C9));
 
       // Dark theme: card is #1F271C, screen is #131313, text is subtle white #EEE9D9
       expect(AppTheme.darkBackgroundColor, const Color(0xFF131313));
